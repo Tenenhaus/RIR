@@ -2,7 +2,7 @@
 title: "RIR <br> "
 subtitle: "Rapide Introduction à R"
 author: "Vincent Guillemot"
-date: "Mardi 8 sept. 2014"
+date: "Mardi 8 sept. 2015"
 output: ioslides_presentation
 ---
 
@@ -15,7 +15,7 @@ mean(x)
 var(x)
 ```
  - Rappels de Biostatistique sur les modèles linéaires...
- \[\bar x = \frac{1}{n}\sum_{i=1}^n x_i, s^2 = \frac{1}{n-1}\sum_{i=1}^n \left( x_i - \bar x \right)^2\]
+ \[\bar x = \frac{1}{n}\sum_{i=1}^n x_i, ~ s^2 = \frac{1}{n-1}\sum_{i=1}^n \left( x_i - \bar x \right)^2\]
 
 
 
@@ -50,11 +50,15 @@ grid()
 
 ## Comprehensive R Archive Network -- CRAN
  
-![http://www.cran.r-project.org](../images/logo_R.png)
+ 
+http://cran.r-project.org/
+
+![CRAN](../images/logo_R.png)
 
 ## R Studio
 
 http://www.rstudio.com
+
 ![RStudio](../images/RStudio-Ball.png)
 
 ## R Markdown
