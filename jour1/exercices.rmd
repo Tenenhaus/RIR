@@ -1,0 +1,21 @@
+---
+title: "Exercices de la session 1"
+author: "Vincent Guillemot"
+output: pdf_document
+---
+
+# Fonction de Gauss
+
+
+# Modèle linéaire : lire un résultat
+
+Poids du cerveau en fonction du poids total
+
+http://people.sc.fsu.edu/~jburkardt/datasets/regression/x01.txt
+
+# La corrélation: rappels et calcul *à la main*
+
+# Lecture de données
+
+# Boucle `for`
+
