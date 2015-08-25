@@ -1,0 +1,24 @@
+---
+title: "R, objets et commandes"
+subtitle: "Rapide Introduction à R"
+author: "Vincent Guillemot"
+date: "Mardi 8 sept. 2015"
+output: ioslides_presentation
+---
+
+
+## Données
+
+## Lire et sauvegarder : résumé
+
+Commande | lire | sauvegarder
+--|--|--
+`data` | Oui | Non
+`load` | Oui | Non
+`save` | Non | Oui
+`read.table` | Oui | Oui
+`write.table` | Non | Oui
+`read.*` | Oui | Oui
+`write.*` | Non | Oui
+
+## Format *long* et *wide*
