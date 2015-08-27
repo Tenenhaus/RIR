@@ -1,0 +1,61 @@
+---
+title: "Représentations graphiques statistiques"
+subtitle: "Rapide Introduction à R"
+author: "Vincent Guillemot & Justine Guégan"
+date: "Mercredi 9 sept. 2015"
+output: ioslides_presentation
+---
+
+## Le diagramme en batons
+
+```{r}
+barplot(1:5)
+```
+
+## Le diagramme de Tukey
+
+```{r}
+boxplot(rnorm(100))
+```
+
+
+## L'histogramme
+
+```{r}
+hist(rnorm(100))
+```
+
+## Le diagramme en camembert
+
+```{r}
+pie(1:3)
+```
+
+
+## Le *dotchart*
+
+```{r}
+dotchart(1:10)
+```
+
+
+## Le *stripchart*
+
+```{r}
+stripchart(runif(100))
+```
+
+## Le *bubble chart*
+
+```{r, message=FALSE}
+require(DescTools)
+PlotBubble(sample(1:10), sample(1:10), runif(10, 2, 10), col=0, border=1)
+```
+
+## Etc. etc. etc.
+
+Il existe de très nombreuses représentations graphiques dans le monde des statistiques, et beaucoup sont accessibles avec R !
+
+Pour avoir une idée des représentations utiles / faisables / déconseillés, allons faire un tour sur
+
+http://shiny.stat.ubc.ca/r-graph-catalog/

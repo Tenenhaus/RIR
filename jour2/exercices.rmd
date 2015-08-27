@@ -375,10 +375,19 @@ Enfin, après visualisation, il est classique de faire des t-tests et des ANOVAs
 6. Sans utiliser de boucle, faites un t-test (`t.test`) et une ANOVA (`aov`) sur une sélection de quelques gènes (2 ou 3). Est-ce que les résultats sont surprenants ?
 
 
+# Expression de gènes
 
+Le jeu de données réelles sur lequel nous allons travaillé dans cet exercice est extrait d'une étude sur puces à ADN qui s'intéresse à la comparaison de l'expression de gènes dans la *substance noire* chez des patients Parkinsoniens et chez des contrôles [@Lesnick2007]. Nous avons extrait de ce jeu de données uniquement 69 gènes qui appartiennent à trois groupes fonctionnels différents :
 
+  * `COG`, contenant des gènes liés à des processus cognitifs,
+  * `MOT`, contenant des gènes ayant un impact sur les fonctions motrices,
+  * `HLA`, un groupe controle n'ayant apparemment pas de lien avec la maladie de Parkinson.
 
+When confronted to real data, it is difficult to know if the biological hypotheses formulated about the prior information can really be observed. In our example, it seems logical to formulate the hypothesis that genes linked to cognitive impairment and motor symptoms must be correlated to the fact that an individual has Parkinson's disease. Additionally, it is straightforward to assume that genes involved in the immune system have little impact on the phenotype. However, the reality of biological data is sometimes disappointing, as we see in the Heat Map below, it does not seem obvious that the 3 families of genes behave as expected. 
 
+  1. Utilisez la fonction  `load` pour charger en mémoire le jeu de données `gene.RData`.
+  2. Quels sont les objets qui viennent d'être chargés, et quelles en sont les charactéristiques principales ? (classe, dimensions, etc.)
+  3. A l'aide de la fonction `pheatmap` de la librairie du même nom, faites une représentation graphique du jeu de données.
 
 
 
