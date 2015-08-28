@@ -107,3 +107,15 @@ Encore une fois, nous voyons que R nous propose une variété immense de représ
 
 Nous allons voir pendant les travaux pratiques comment nous allons pouvoir mettre à contribution cet incroyable arsenal de méthodes pour l'analyse de données.
 
+## Bonus : sauvegarder un graphe
+
+```{r, eval=FALSE}
+pdf("chemin_du_plot.pdf")
+plot(1:10, type="b")
+dev.off()
+```
+
+Pour connaître tous les formats de sauvegarde `?Devices` : 
+
+ > `pdf`, `postscript`, `xfig`, `bitmap`, ..., `png`, `svg`, `tiff` etc.
+

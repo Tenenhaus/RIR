@@ -4,12 +4,11 @@ author: "Vincent Guillemot & Justine Guégan"
 output: pdf_document
 header-includes :
   - \usepackage{graphicx}
+bibliography: jour2.bib
 ---
 
 
-# Rappels : vecteurs, matrices, tableaux et listes
-
-## Déclaration et indexation de vecteurs et de matrices
+# Exercice 1 : Déclaration et indexation de vecteurs et de matrices
 
 Déclarons tout d'abord un vecteur `a` contenant les entiers pairs de 2 à 20. Le tableau suivant présente quelques solutions qui permettent de générer un tel vecteur :
 
@@ -34,140 +33,24 @@ Travaillons maintenant sur une matrice carrée `A` ($4 \times 4$) contenant les 
 A <- matrix(1:16, 4, 4, byrow = TRUE)
 ```
 
-1. Extrayez la première ligne et la première colonne de cette matrice.
-2. Extrayez la matrice $2 \times 2$ qui se trouve au centre des `A` et qui contient les valeurs 6, 7, 10 et 11.
+4. Extrayez la première ligne et la première colonne de cette matrice.
+5. Extrayez la matrice $2 \times 2$ qui se trouve au centre des `A` et qui contient les valeurs 6, 7, 10 et 11.
+6. Faites une `image` de cette matrice en utilisant l'échelle de couleurs `rainbow`.
 
-### Proposition de solution
+# Exercice 2 : Papillons
 
-```{r}
-a <- seq(2, 20, by=2)
-b <- factor( rep(c("moins", "plus"), 10), ordered=TRUE )
-table(b)
-barplot(table(b), col="steelblue")
-b[a]
-b[b=="plus"]
-droplevels(b[a])
-A <- matrix(1:16, 4, 4, byrow = TRUE)
-A[1,]
-A[,1]
-A[2:3, 2:3]
-```
-
-## Déclaration et indexation de tableaux et de listes
-
-Nous nous baserons pour cet exercice sur un exemple directement inspiré des modèles linéaires. On considère le modèle linéaire suivant : on a deux mesures $x$ et $y$, et un modèle qui les lie \[y  = 2 x + \epsilon.\]  $\epsilon$ est un terme de bruit, que nous allons considérer pour cet exemple gaussien, de moyenne nulle et d'écart-type unitaire.
-
-Ce modèle ne fait pas spécialement d'hypothèses sur les distributions sous-jacentes (celles à l'origine des échantillons $x$ et $y$). On peut décider, pour cet exemple, de concrétiser un peu et de se dire que $x$ est une mesure de la "taille" d'individus (comprise uniformément entre 150 et 200 cm) et que $y$ est une mesure du poids de ces même individus. Sans bruit, le poids d'un individu est donc calculé en multipliant sa taille par 2.
-
-1. Générez un échantillon de taille 100 pour $x$ à l'aide de la fonction `runif`. Attention, pour respecter la philosophie de l'exemple, il faut spécifier les bornes `min` et `max`.
-2. Générez le bruit dans une variable `epsilon` avec la fonction `rnorm`.
-3. Générez $y$ en respectant le modèle spécifié ci-dessus.
-4. Placez $x$ et $y$ dans un objet de classe `data.frame`, appelé `B`, avec la commande suivante : `B <- data.frame(x=x, y=y)`.
-
-Pour représenter graphiquement notre expérience, nous pouvons utiliser un "biplot" :
-```{r, eval=FALSE}
-plot(B, xlab="Taille (cm)", ylab="Poids (kg)")
-```
-
-Avec des *formules*, on peut reproduire le même graphique. Ce concept de formule est très utile en R. Il faut bien faire attention à la syntaxe : pour pouvoir interpréter une formule, R doit pouvoir interpréter chacun des termes. Le premier terme à gauche du signe ~ représente l'axe des ordonnées (vertical), ou encore la variable à expliquer (qui s'appelle très souvent, par convention, $y$). A gauche du signe ~, se trouve le reste du modèle, et donc l'ensemble des variables explicatives (ici, il n'y en a qu'une, $x$). Pour un graphe, il ne peut y avoir qu'une variable explicative, qui représente l'axe des abscisses (horizontal). 
-
-> Moyen mnémotechnique pour se souvenir du sens du signe ~ : quand vous lisez une formule, remplacez "~" par "en fonction de". Ainsi, "y~x" devient "y en *fonction de* x".
-
-Voici deux exemples de commandes qui permettent de reproduire le graphe de *$y$ en fonction de $x$* :
-```{r, eval=FALSE}
-plot(B$y~B$x, xlab="Taille (cm)", ylab="Poids (kg)")
-plot(y~x, data=B, xlab="Taille (cm)", ylab="Poids (kg)")
-```
-
-Pour la première commande, R sait ce que vaut chaque terme de la formule `B$y~B$x` : `B$y` existe bien, il s'agit de la colonne `y` qui se trouve dans `B` ; de même pour `B$x`. En revanche, pour la deuxième expression, R ne peut pas savoir qu'il s'agit des variables `x` et `y` contenues dans `B` qu'il faut lire au moment d'interpréter la formule `y~x`. Il faut donc lui préciser grâce à l'argument `data=B`.
-
-5. Stockez le résultat de la commande `cor.test(B$x, B$y)` dans la variable `res.test`. `res.test` est une liste ! Vérifiez le avec la fonction `mode` ! Attention, la commande `class(res.test)` donnera un résultat différent.
-6. Quels sont les différents éléments qui composent cette liste ? Utilisez la fonction `names`. Récupérez dans cette liste l'intervalle de confiance (`conf.int`) de la corrélation.
-
-### Proposition de solution
-
-```{r}
-x <- runif(100, 150, 200)
-epsilon <- rnorm(100)
-y <- 2*x + epsilon
-B <- data.frame(x=x, y=y)
-plot(B, xlab="Taille (cm)", ylab="Poids (kg)")
-
-res.test <- cor.test(B$x, B$y)
-c(mode(res.test), class(res.test))
-names(res.test)
-
-res.test$conf.int
-```
-
-### La régression simple
-
-1. Importer dans une variable nommée `X` le jeu de donné nommé `appart.csv`. *Indice : `read.csv`*.
-2. Tracer le graphe bivarié de la surface sur le prix. Que constate-t-on ? *Indice : `plot`*. 
-3. Construire un modèle linéaire reliant le prix à la surface. *Indice : `lm`*.
-4. Ajouter au graphe bivarié construit à la question 1, la droite de régression résultant du modèle de la question 2. *Indice : `abline`*.
-5. Donner les valeurs prédites par le modèle pour chacune des observations. *Indice : `predict`*.
-6. Observer les résidus. *Indice : `...$residuals`*.
-
-#### Proposition de correction.
-
-On peut construire `X` en utilisant la fonction `read.csv` :
-```{r, eval=FALSE}
-X <- read.csv("appart.csv")
-```
-
-Obtenir le plot bivarié s'obtient très rapidement avec la fonction `plot` :
-```{r, eval=FALSE}
-plot(X)
-```
-
-On constate qu'il y a un lien fort, comme on pouvait s'y attendre, entre la surface et le prix d'un appartement.
-En ajoutant le modèle linéaire au graphe, on se rend compte qu'il modélise très bien le lien entre les deux variables.
-```{r, eval=FALSE}
-plot(surface~prix, data=X, pch=16)
-abline(lm(surface~prix, data=X), col=2)
-grid()
-```
-
-La prédiction de la surface se fait avec la fonction `predict`. Il est important de réaliser que cette fonction peut s'utiliser sur de nouvelles données ! On peut donc prédire, avec le modèle construit, la surface d'un appartement quand on connaît son prix. 
-```{r, eval=F}
-res.lm <- lm(surface~prix, data=X)
-predict(res.lm, data=X)
-```
-
-Enfin, les résidus sont calculés en même temps que le modèle. On peut y accéder avec la commande suivante (quand le modèle a été attribué à une variable s'appelant `res.lm`) :
-```{r, eval=FALSE}
-res.lm$residuals
-```
-
-
-### La régression multiple et la sélection de variables
-
-Reprenons l'exemple précédent et rajoutons deux variables qui n'ont absolument rien à voir avec le prix et la surface des appartements : une première variable `z1` constituée aléatoirement de 0 et de 1 et une deuxième variable `z2` constituée de valeurs aléatoires réparties uniformément entre 0 et 1.
+Les longueurs d'ailes de 24 papillons ont été mesurées (en cm) [@Zar2010]:
 
 ```{r, eval=FALSE}
-n <- nrow(X)
-X$z1 <- sample(0:1, n, replace=TRUE)
-X$z2 <- runif(n)
+butterflies <- c( 3.3, 3.5, 3.6, 3.6, 3.7, 3.8, 
+                  3.8, 3.8, 3.9, 3.9, 3.9, 4.0,
+                  4.0, 4.0, 4.0, 4.1, 4.1, 4.1, 
+                  4.2, 4.2, 4.3, 4.3, 4.4, 4.5 )
 ```
 
-Observons maintenant le résultat de l'ajustement d'un modèle linéaire multiple (c'est à dire contenant plus d'une variable) :
-```{r, eval=FALSE}
-summary(lm(surface ~ prix + z1 + z2, data=X))
-```
+ * Représentez côte à côte un histogramme et un diagramme de Tukey de cet échantillon de mesures.
 
-On remarque que les coefficients associés aux variables $z1$ et $z2$ ont des valeurs qui ne semblent pas proches de 0, et pourtant leur significativité dans le modèle est faible ! Il est donc important de toujours utiliser la fonction `summary` pour mettre en perspective les valeurs des coefficients.
-
-Enfin, il est possible d'utiliser la fonction `step` pour sélectionner le modèle permettant le mieux de décrire les relations entre les différentes variables :
-```{r, eval=FALSE}
-step(lm(surface ~ prix + z1 + z2, data=X))
-```
-
-Pour cet exemple très simple, les variables `z1` et `z2` ont été éliminées du modèle initial, et on a convergé vers un modèle du type `surface ~ prix`. Il faut faire attention au fait que la méthode utilisée est très sensible : le résultat dépend du nombre de variables, du nombre d'individus, et pose des hypothèses fortes sur la nature statistique des données.
-
-Par exemple, reprenons l'exemple précédent après avoir rajouté 10 variables aléatoire sans rapport avec le prix ou la surface au jeu de données `X`. *(à faire en exercice)*
-
-## Exercice 11 : génération de données aléatoires et représentation en histogramme
+# Exercice 3 : Génération de données aléatoires et représentation en histogramme
 
 Pour chaque type de variable aléatoire suivante, tracer un histogramme d'un échantillon aléatoire de taille $n$. 
 
@@ -177,8 +60,15 @@ Pour chaque type de variable aléatoire suivante, tracer un histogramme d'un éc
 * variable de Student, `rt`.
 
 Un exemple pour une variable aléatoire normale vous est proposé : `hist(rnorm(100))`.
+Représentez également sur ce graphe la densité correspondante . Par exemple :
 
-## Exercice 6 : création de fonction
+```{r}
+xnorm <- rnorm(100)
+hist(xnorm, freq=FALSE)
+plot(dnorm, col=2, lwd=2, xlim=c(-3,3), add=TRUE)
+```
+
+# Exercice 4 : Création de fonction
 
 1. Exécutez les commandes `data(iris)` puis `print(iris)`. Nous venons de charger en mémoire l'un des nombreux jeux de données distribués avec R ! Profitez de l'aide sur ce jeu de données pour en apprendre un peu plus sur les fleurs (`?iris`) !
 2. Afin de représenter l'histogramme de la première colonne de `iris`, exécutez la commande `hist(iris[,1])`. Trouvez l'argument à changer de sorte que la couleur des "barres" de l'histogramme soit égale à `"steelblue"` et la couleur des bords égale à `"white"`.
@@ -197,37 +87,48 @@ f <- function(i) {
 }
 ```
 
+# Exercice 5 : Déclaration et indexation de tableaux et de listes
 
-## Exercice 9 : papillons de lumièRe
+Nous nous baserons pour cet exercice sur un exemple directement inspiré des modèles linéaires. On considère le modèle linéaire suivant : on a deux mesures $x$ et $y$, et un modèle qui les lie \[y  = 2 x + \epsilon.\]  $\epsilon$ est un terme de bruit, que nous allons considérer pour cet exemple gaussien, de moyenne nulle et d'écart-type égal à 1.
 
-Les longueurs d'ailes de 24 papillons ont été mesurées (en cm) [Zar]:
+Ce modèle ne fait pas spécialement d'hypothèses sur les distributions sous-jacentes (celles à l'origine des échantillons $x$ et $y$). On peut décider, pour cet exemple, de concrétiser un peu et de se dire que $x$ est une mesure de la "taille" d'individus (comprise uniformément entre 150 et 200 cm) et que $y$ est une mesure du poids de ces même individus. Sans bruit, le poids d'un individu est donc calculé en multipliant sa taille par 2.
 
+1. Générez un échantillon de taille 100 pour $x$ à l'aide de la fonction `runif`. Attention, pour respecter la philosophie de l'exemple, il faut spécifier les bornes `min` et `max`.
+2. Générez le bruit dans une variable `epsilon` avec la fonction `rnorm`.
+3. Générez $y$ en respectant le modèle spécifié ci-dessus.
+4. Placez $x$ et $y$ dans un objet de classe `data.frame`, appelé `B`, avec la commande suivante : `B <- data.frame(x=x, y=y)`.
+
+Pour représenter graphiquement notre expérience, nous pouvons utiliser un "biplot" :
 ```{r, eval=FALSE}
-butterflies <- c( 3.3, 3.5, 3.6, 3.6, 3.7, 3.8, 
-                  3.8, 3.8, 3.9, 3.9, 3.9, 4.0,
-                  4.0, 4.0, 4.0, 4.1, 4.1, 4.1, 
-                  4.2, 4.2, 4.3, 4.3, 4.4, 4.5 )
+plot(B, xlab="Taille (cm)", ylab="Poids (kg)")
 ```
 
-1. Calculez des statistiques simples sur cet échantillons et l'intervalle de confiance à 95 % sur la moyenne. Quelle(s) hypothèse(s) doit-on faire pour calculer ce dernier ?  Représentez un histogramme.
+Avec des *formules*, on peut reproduire le même graphique. Ce concept de formule est très utile en R. Il faut bien faire attention à la syntaxe : pour pouvoir interpréter une formule, R doit pouvoir interpréter chacun des termes. Le premier terme à gauche du signe ~ représente l'axe des ordonnées (vertical), ou encore la variable à expliquer (qui s'appelle très souvent, par convention, $y$). A droite du signe ~, se trouve le reste du modèle, et donc l'ensemble des variables explicatives (ici, il n'y en a qu'une, $x$). Pour un graphe, il ne peut y avoir qu'une variable explicative, qui représente l'axe des abscisses (horizontal). 
 
-2. *Question subsidiaire :* calculez l'intervalle de confiance sur la variance de cet échantillon.
-$$ \left[ \frac{(n-1) s^2}{\chi_{\frac{1-\alpha}{2},n-1}^2} \text{~;~} \frac{(n-1) s^2}{\chi_{\frac{\alpha}{2},n-1}^2} \right]$$
-*Indice : `qchisq`.*
+> Comment se souvenir du sens du signe "~" ? Quand vous lisez une formule, remplacez "~" par "*en fonction de*". Ainsi, "y~x" devient "y en *fonction de* x".
 
+Voici deux exemples de commandes qui permettent de reproduire le graphe de *$y$ en fonction de $x$* :
+```{r, eval=FALSE}
+plot(B$y~B$x, xlab="Taille (cm)", ylab="Poids (kg)")
+plot(y~x, data=B, xlab="Taille (cm)", ylab="Poids (kg)")
+```
 
-## Exercice 12 : Etude de la moyenne empirique sur des données simulées [Husson & Pagès]
+Pour la première commande, R sait ce que vaut chaque terme de la formule `B$y~B$x` : `B$y` existe bien, il s'agit de la colonne `y` qui se trouve dans `B` ; de même pour `B$x`. En revanche, pour la deuxième expression, R ne peut pas savoir qu'il s'agit des variables `x` et `y` contenues dans `B` qu'il faut lire au moment d'interpréter la formule `y~x`. Il faut donc lui préciser grâce à l'argument `data=B`.
 
-Générez, avec le logiciel R, 1000 échantillons de taille 47 et stockez les dans une matrice (matrix) à 1000 lignes et 47 colonnes, échantillons qui seront gaussiens de moyenne nulle et de variance 1. 
+5. Stockez le résultat de la commande `cor.test(B$x, B$y)` dans la variable `res.test`. `res.test` est une liste ! Vérifiez le avec la fonction `mode` ! Attention, la commande `class(res.test)` donnera un résultat différent.
+6. Quels sont les différents éléments qui composent cette liste ? Utilisez la fonction `names`. Récupérez dans cette liste l'intervalle de confiance (`conf.int`) de la corrélation.
+
+# Exercice 6 : Etude de la moyenne empirique sur des données simulées [@Husson2013]
+
+Générez, avec le logiciel R, 1000 échantillons de taille 47 et stockez les dans une matrice (`matrix`) à 1000 lignes et 47 colonnes. Ces échantillons seront gaussiens de moyenne nulle et de variance 1. 
 
 1. On veut calculer la moyenne empirique d'échantillons de taille 2, 5, 10 et 30. Utilisez les 2 premières colonnes pour calculer 1000 moyennes sur 2 individus, les colonnes 3 à 7 pour 5 individus, les colonnes 8 à 17 pour 10 individus et 18 à 47 pour 30 individus. 
 2. Construisez un histogramme de ces 1000 moyennes pour chaque taille d'échantillon.
 3. Reprendre les mêmes questions pour une loi uniforme sur $[-1, 1]$.
 
+# Exercice 7 : Fonction de survie
 
-## Exercice 14
-
-19 malades atteints d'un cancer du poumon ont été traités chirurgicalement (ablation du poumon atteint) dans un même service de chirurgie et suivis jusqu'a leur décès. La série des durées de survie, mesurées en semaines a partir de la date de l'intervention chirurgicale jusqu'a celle du décès, est la suivante : 
+19 malades atteints d'un cancer du poumon ont été traités chirurgicalement (ablation du poumon atteint) dans un même service de chirurgie et suivis jusqu’à leur décès. La série des durées de survie, mesurées en semaines a partir de la date de l'intervention chirurgicale jusqu’à celle du décès, est la suivante : 
 
 ```{r, eval=FALSE}
 x <- c(25,  45, 238, 194, 16, 23, 30, 16, 22, 123, 51, 412, 162,  14, 72, 35, 30, 91, 45)
@@ -241,10 +142,9 @@ est la fonction de répartition empirique.
 3. Construisez le diagramme de Tukey (boite a moustaches).
 4. Représentez graphiquement $F(x)$ et *attention, question difficile* $S(x)$.
 
+# Exercice 8 : Hémoglobine
 
-## Exercice 15
-
-On considère une série statistique de 60 taux d'hémoglobine dans le sang (gr/l) mesures sur des adultes presumes en bonne santé. 
+On considère une série statistique de 60 taux d'hémoglobine dans le sang (gr/l) mesurés sur des adultes présumés en bonne santé. 
 
 Valeurs mesurées chez les hommes :
 ```{r, eval=FALSE}
@@ -253,7 +153,6 @@ hom <- c(141 , 144 , 146 , 148 , 149 , 150 , 150 , 151 , 153 , 153 , 153 ,
          166 , 168 , 168 , 170 , 172 , 172 , 176 , 179.1)
 ```
 
-
 Valeurs mesurées chez les femmes : 
 ```{r, eval=FALSE}
 fem <- c(105 , 110 , 112 , 112 , 118 , 119 , 120 , 120 , 125 , 126 , 127 , 
@@ -261,51 +160,27 @@ fem <- c(105 , 110 , 112 , 112 , 118 , 119 , 120 , 120 , 125 , 126 , 127 ,
          145 , 148 , 148 , 150 , 151 , 154 , 154 , 158)
 ```
 
-1. Calculez les moyennes et quartiles de ces échantillons.
-2. Déterminez les étendues de ces distributions.
-3. Calculez l'écart interquartile pour chacune des trois distributions.
-4. Tracez les diagrammes de Tukey (boites a moustache) des trois distributions.
-5. Calculez les variances et les écarts-types de ces distributions.
-6. Utilisez la fonction `boxplot` avec l'option `notch = TRUE` : que dit l'aide de la fonction et que pouvez vous conclure ?
+1. Tracez les diagrammes de Tukey (boites a moustache) des deux échantillons.
+2. Utilisez la fonction `boxplot` avec l'option `notch = TRUE` : que dit l'aide de la fonction et que pouvez vous conclure ?
 
-## Exercice 19 (difficile)
+# Exercice 9 : Paramètres graphiques simples
 
-La fonction exponentielle peut s'approximer à l'aide de séries entières. Mathématiquement :
-$$ \lim_{n \rightarrow + \infty } \sum_{k=0}^n \frac{x^k}{k!} = e^x,$$ 
-où $k! = 1 \times 2 \times ... \times k$ est la fonction *factorielle*.
+1. Créez une matrice, `mat1`, composée de 100 lignes et deux colonnes; chacune des colonnes de loi normale **centrée** et de variance 1.
+2. Créez une matrice, `mat2`, composée de 100 lignes et deux colonnes; chacune des colonnes de loi normale de **moyenne 1** et de variance 1.
+3. Tracez le graphe bivarié de la première colonne de `mat1` sur la deuxième colonne de `mat1`.
+4. Ajoutez au graphe précédent (et d’une couleur différente ; pour connaître la liste des couleurs disponibles, tapez la commande `colors()`) le graphe bivarié de la première colonne de `mat2` sur la deuxième colonne de `mat2`. Que constatez vous?
+5. Rectifiez les problèmes que vous constatez à la question 4.
 
-Nous allons montrer graphiquement la qualité de cette approximation avec les étaês suivantes.
+# Exercice 10 : Faillite d'entreprises
 
-1. Initialisez deux vecteurs `a` et `b` à la valeur 1.
-2. Initialisez un réel `x` à la valeur 0.2.
-3. Initialisez un entier `n` à la valeur 10.
-4. A l'aide d'une boucle `for`, faites en sorte que `a` et `b` soient tels que 
-$$ a[1] = b[1] = 1 \text{~puis~} a[k] = x^{k-1} \text{~et~} b[k] = (k-1)! \text{~pour~} k=2, ..., n.$$
-*(Indice : utilisez la fonction `factorial`)*
-5. Divisez `a` par `b` et faites en la somme ! Vous obtenez ainsi une approximation à 10 termes de $e^{0.2}$.
-6. Répétez l'opération pour obtenir toutes les approximations de $e^{0.2}$ à 2, 3, ..., 8 et 9 termes.
-7. Faites un graphe contenant ces valeurs et observez la vitesse de convergence !
-
-
-# Les graphiques
-
-1. Créer une matrice, `mat1`, composée de 100 lignes et deux colonnes; chacune des colonnes de loi normale centrée et de variance 1.
-2. Créer une matrice, `mat2`, composée de 100 lignes et deux colonnes; chacune des colonnes de loi normale de moyenne 1 et de variance 1.
-3. Tracer le graphe bivarié de la première colonne de `mat1` sur la deuxième colonne de `mat1`.
-4. Ajouter au graphe précédent (et d’une couleur différente ; pour connaître la liste des couleurs disponibles, tapez la commande `colors()`) le graphe bivarié de la première colonne de `mat2` sur la deuxième colonne de `mat2`. Que constatez vous?
-5. Rectifier les problèmes que vous constatez à la question 4.
-
-### Faillite d'entreprises
-
-1. Importer dans une variable nommée `G` le jeu de données nommé `faillite.csv`.
+1. Importez dans une variable nommée `G` le jeu de données nommé `faillite.csv`.
 2. Quel est le mode de ce jeu de données ?
-3. Convertir `G` en une matrice `H`.
+3. Convertissez `G` en une matrice `H`.
 4. Tapez la commande `plot(H)`. Que construit la fonction `plot()` dans le cadre des matrices ?
 5. Tapez la commande `plot(G)`. Que construit la fonction `plot()` dans le cadre d'objets de classe `data.frame` ?
-6. Faire un graphique "esthétique" du jeu de données `faillite` (couleur, titre, forme, labels, etc.).
+6. Faites un graphique "esthétique" du jeu de données `faillite` (couleur, titre, forme, labels, etc.).
 
-
-### Les vins de Bordeaux
+# Exercice 11 : Les vins de Bordeaux
 
 Nous allons étudier à l’aide des outils graphiques disponibles sous R le jeu de de données `bordeaux.xls`. Il s’agit d’un jeu de données qui fournit la qualité d'un vin de bordeaux (`QUALITE`) en fonction de 4 facteurs (`TEMPERAT`, `SOLEIL`, `CHALEUR`, `PLUIE`) mesurés sur 34 années consécutives.
 
@@ -327,7 +202,19 @@ vins de bordeaux.
 
 Qu’en concluez-vous?
 
-# Etude de l'expression de gènes dans certaines zones du cerveau. Visualisation et comparaison de l'expression de ces gènes
+# Exercice 12 : Expression de gènes
+
+Le jeu de données réelles sur lequel nous allons travailler dans cet exercice est extrait d'une étude sur puces à ADN qui s'intéresse à la comparaison de l'expression de gènes dans la *substance noire* chez des patients Parkinsoniens et chez des contrôles [@Lesnick2007]. Nous avons extrait de ce jeu de données uniquement 69 gènes qui appartiennent à trois groupes fonctionnels différents :
+
+  * `COG`, contenant des gènes liés à des processus cognitifs,
+  * `MOT`, contenant des gènes ayant un impact sur les fonctions motrices,
+  * `HLA`, un groupe contrôle n'ayant apparemment pas de lien avec la maladie de Parkinson.
+
+  1. Utilisez la fonction `load` pour charger en mémoire le jeu de données `gene.RData`.
+  2. Quels sont les objets qui viennent d'être chargés, et quelles en sont les caractéristiques principales ? (classe, dimensions, etc.)
+  3. A l'aide de la fonction `pheatmap` de la librairie du même nom, faites une représentation graphique du jeu de données.
+
+# Exercice 13 : Etude de l'expression de gènes dans certaines zones du cerveau. Visualisation et comparaison de l'expression de ces gènes
 
 > Les données *haut-débit*, et en particulier les mesures d'expression de gènes, sont une source inépuisable d'inspiration pour les statisticiens. De nombreuses méthodes ont été ainsi dépoussiérées et adaptés au fait que l'analyse de milliers de variables pose des problèmes tout à fait différents de ce que peut être l'analyse d'une ou deux variables. Par exemple, des méthodes de visualisation comme l'*Analyse en Composantes Principales* ou les *heatmaps*, qui jusqu'à présent peinaient à prendre leur place dans la boîte à outil du statisticien, deviennent maintenant des étapes presque incoutournable de l'analyse.
 
@@ -362,33 +249,16 @@ Un premier outil de visualisation pour des données haut-débit est le diagramme
 
 3. Utilisez un `boxplot` pour observer les expressions de quelques-unes (par exemple une dizaine) des puces (les colonnes) du jeu de données. Faites la même chose sur les lignes (les gènes). 
 
-Une représentation très synthétique d'un jeu de données, et qui permet d'identifier d'un coup d’œil différentes sources de variabilités, est l'ACP (Analyse en Composantes Principales). Le principe est de résumer par quelques composantes toutes les variables d'un jeu de données. Ces composantes captures l'une après l'autre les sources les plus importantes de variabilité.
+Une représentation très synthétique d'un jeu de données, et qui permet d'identifier d'un coup d’oeil différentes sources de variabilités, est l'ACP (Analyse en Composantes Principales). Le principe est de résumer par quelques composantes toutes les variables d'un jeu de données. Ces composantes capturent l'une après l'autre les sources les plus importantes de variabilité.
 
-4. Utilisez la commande suivante pour calculer l'ACP du jeu de données : `acp <- prcomp(t(expressions), scale=TRUE)`. Puis `plot(acp)` : cela permet de classer les composantes depuis celle qui capture le plus de variabilité jusqu'à celle qui en capture le moins. Cela permet de savoir quel est la répartition de la variabilité au sein des différentes composantes. Enfin, on peut représenter par des couleurs différents facteurs pour essayer de savoir s'ils corrèlent avec une ou plusieurs composantes. Exécutez la commandes `plot(acp$x, col=as.numeric(y))`. Que venons-nous de faire ? L'ACP est une source importante d'information quand on analyse des données si difficiles à manipuler : c'est un outil qui permet de repérer des sources de biais, des outliers, et de vérifier visuellement qu'un effet est présent dans un jeu de données.
+4. Utilisez la commande suivante pour calculer l'ACP du jeu de données : `acp <- prcomp(t(expressions), scale=TRUE)`. Puis `plot(acp)` : cela permet de visualiser la variabilité capturée par chacune des composantes. Enfin, on peut représenter par des couleurs différents facteurs pour essayer de savoir s'ils corrèlent avec une ou plusieurs composantes. Exécutez la commandes `plot(acp$x, col=as.numeric(y))`. Que venons-nous de faire ? L'ACP est une source importante d'information quand on analyse des données si difficiles à manipuler : c'est un outil qui permet de repérer des sources de biais, des outliers, et de vérifier visuellement qu'un effet est présent dans un jeu de données.
 
 Une autre représentation importante pour l'analyse de données comprenant de nombreuses variables et de nombreux individus est la *Heatmap* : elle est souvent couplée avec des méthodes de *clustering* permettant de créer de façon non-supervisée des groupes de variable et/ou d'individus. Après clustering, on voit ainsi très vite les gènes qui sont sur-exprimés ou sous-exprimés sous différentes conditions.
 
 5. Utilisez la fonction `heatmap` sur le jeu de données `expressions` après avoir transformé celui-ci en matrice (fonction `as.matrix`). Pour changer l'échelle de couleur, utiliser la fonction `terrain.colors` de la librairie `grDevices`. Parcourez l'aide très fournie de cette fonction pour représenter le facteur `y` sur cette figure. Cela requerra l'utilisation de l'argument `RowSideColors` et de l'argument `margins`.
 
-Enfin, après visualisation, il est classique de faire des t-tests et des ANOVAs pour chaque gène : une ANOVA (commande `aov`) permettra de savoir si au moins une des régions définies par le facteur `regions` est en moyenne exprimée différemment des autres, tandis que le t-test (`t.test`) sera utilisé pour savoir par exemple si les témoins présentent une expression différentielle pour le gène considéré par rapport au cas.
+\newpage
 
-6. Sans utiliser de boucle, faites un t-test (`t.test`) et une ANOVA (`aov`) sur une sélection de quelques gènes (2 ou 3). Est-ce que les résultats sont surprenants ?
-
-
-# Expression de gènes
-
-Le jeu de données réelles sur lequel nous allons travaillé dans cet exercice est extrait d'une étude sur puces à ADN qui s'intéresse à la comparaison de l'expression de gènes dans la *substance noire* chez des patients Parkinsoniens et chez des contrôles [@Lesnick2007]. Nous avons extrait de ce jeu de données uniquement 69 gènes qui appartiennent à trois groupes fonctionnels différents :
-
-  * `COG`, contenant des gènes liés à des processus cognitifs,
-  * `MOT`, contenant des gènes ayant un impact sur les fonctions motrices,
-  * `HLA`, un groupe controle n'ayant apparemment pas de lien avec la maladie de Parkinson.
-
-When confronted to real data, it is difficult to know if the biological hypotheses formulated about the prior information can really be observed. In our example, it seems logical to formulate the hypothesis that genes linked to cognitive impairment and motor symptoms must be correlated to the fact that an individual has Parkinson's disease. Additionally, it is straightforward to assume that genes involved in the immune system have little impact on the phenotype. However, the reality of biological data is sometimes disappointing, as we see in the Heat Map below, it does not seem obvious that the 3 families of genes behave as expected. 
-
-  1. Utilisez la fonction  `load` pour charger en mémoire le jeu de données `gene.RData`.
-  2. Quels sont les objets qui viennent d'être chargés, et quelles en sont les charactéristiques principales ? (classe, dimensions, etc.)
-  3. A l'aide de la fonction `pheatmap` de la librairie du même nom, faites une représentation graphique du jeu de données.
-
-
+# Références
 
 

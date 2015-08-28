@@ -1,0 +1,16 @@
+---
+title: "Exercices de la session 3"
+author: "Vincent Guillemot & ArthurTenenhaus"
+output: pdf_document
+header-includes :
+  - \usepackage{graphicx}
+---
+
+# Exercice 1 : faire un rapport en R Markdown
+
+# Exercice 2 : cerveaux des mammifères
+
+# Exercice 3 : contraste
+
+
+
