@@ -4,13 +4,236 @@ author: "Vincent Guillemot & ArthurTenenhaus"
 output: pdf_document
 header-includes :
   - \usepackage{graphicx}
+bibliography: jour3.bib
 ---
 
-# Exercice 1 : faire un rapport en R Markdown
+## Exercice 1 : Faire un rapport en R Markdown
 
-# Exercice 2 : cerveaux des mammifères
+ * Créez un rapport en R Markdown basé sur le _template_ proposé par RStudio.
 
-# Exercice 3 : contraste
+# Modèles linéaires simples
+
+# Exercice : Cerveaux des mammifères [@Allison1976]
+
+http://people.sc.fsu.edu/~jburkardt/datasets/regression/x01.txt
+
+# Exercice : Poids et Tailles
+
+Dans une étude de [1990 de Caroline Davis sur l'image de soi parue dans le revue *Appetite*](http://www.researchgate.net/publication/20915210_Body_image_and_weight_preoccupation_Comparison_between_exercising_and_non-exercising_women), l'auteur recueille des mesures de poids et de taille sur des individus auxquels on demande également d'estimer sans appareillement leur taille et poids actuels. Les données de cette partie de l'étude se trouve en suivant [ce lien](http://socserv.mcmaster.ca/jfox/Books/Applied-Regression-2E/datasets/Davis.txt).
+
+ 1. Utilisez la fonction `read.table` pour lire ces données tabulées. Un petit tour sur la page d'aide de la fonction (`?read.table`) aidera certainement.
+ 2. Faites deux graphes côte-à-côte de le taille en fonction du poids mesurés ou reportés.  
+ 3. Pouvez-vous identifier un *outlier* ? Pour cela, vous pouvez éventuellement chercher une fonction pour vous aider dans la librairie [`car`](https://cran.r-project.org/web/packages/car/index.html).
+ 4. Sur le même graphe, représentez la taille en fonction du poids mesurée et reportée. Utilisez la fonction `arrows` pour mieux visualiser les différences.
+
+# Exercice : Contraste
+
+# Exercice : ANOVA
+
+# Exercice : Exemple de test *post-hoc*
+
+# Exercice : Sélection de variable
+
+# Exercice : Comparaison de modèles
+
+### La régression simple
+
+1. Importer dans une variable nommée `X` le jeu de donné nommé `appart.csv`. *Indice : `read.csv`*.
+2. Tracer le graphe bivarié de la surface sur le prix. Que constate-t-on ? *Indice : `plot`*. 
+3. Construire un modèle linéaire reliant le prix à la surface. *Indice : `lm`*.
+4. Ajouter au graphe bivarié construit à la question 1, la droite de régression résultant du modèle de la question 2. *Indice : `abline`*.
+5. Donner les valeurs prédites par le modèle pour chacune des observations. *Indice : `predict`*.
+6. Observer les résidus. *Indice : `...$residuals`*.
+
+#### Proposition de correction.
+
+On peut construire `X` en utilisant la fonction `read.csv` :
+```{r}
+X <- read.csv("appart.csv")
+```
+
+Obtenir le plot bivarié s'obtient très rapidement avec la fonction `plot` :
+```{r}
+plot(X)
+```
+
+On constate qu'il y a un lien fort, comme on pouvait s'y attendre, entre la surface et le prix d'un appartement.
+En ajoutant le modèle linéaire au graphe, on se rend compte qu'il modélise très bien le lien entre les deux variables.
+```{r}
+plot(surface~prix, data=X, pch=16)
+abline(lm(surface~prix, data=X), col=2)
+grid()
+```
+
+La prédiction de la surface se fait avec la fonction `predict`. Il est important de réaliser que cette fonction peut s'utiliser sur de nouvelles données ! On peut donc prédire, avec le modèle construit, la surface d'un appartement quand on connaît son prix. 
+```{r, eval=F}
+res.lm <- lm(surface~prix, data=X)
+predict(res.lm, data=X)
+```
+
+Enfin, les résidus sont calculés en même temps que le modèle. On peut y accéder avec la commande suivante (quand le modèle a été attribué à une variable s'appelant `res.lm`) :
+```{r, eval=FALSE}
+res.lm$residuals
+```
 
 
+### La régression multiple et la sélection de variables
+
+Reprenons l'exemple précédent et rajoutons deux variables qui n'ont absolument rien à voir avec le prix et la surface des appartements : une première variable `z1` constituée aléatoirement de 0 et de 1 et une deuxième variable `z2` constituée de valeurs aléatoires réparties uniformément entre 0 et 1.
+
+```{r}
+n <- nrow(X)
+X$z1 <- sample(0:1, n, replace=TRUE)
+X$z2 <- runif(n)
+```
+
+Observons maintenant le résultat de l'ajustement d'un modèle linéaire multiple (c'est à dire contenant plus d'une variable) :
+```{r}
+summary(lm(surface ~ prix + z1 + z2, data=X))
+```
+
+On remarque que les coefficients associés aux variables $z1$ et $z2$ ont des valeurs qui ne semblent pas proches de 0, et pourtant leur significativité dans le modèle est faible ! Il est donc important de toujours utiliser la fonction `summary` pour mettre en perspective les valeurs des coefficients.
+
+Enfin, il est possible d'utiliser la fonction `step` pour sélectionner le modèle permettant le mieux de décrire les relations entre les différentes variables :
+```{r}
+step(lm(surface ~ prix + z1 + z2, data=X))
+```
+
+Pour cet exemple très simple, les variables `z1` et `z2` ont été éliminées du modèle initial, et on a convergé vers un modèle du type `surface ~ prix`. Il faut faire attention au fait que la méthode utilisée est très sensible : le résultat dépend du nombre de variables, du nombre d'individus, et pose des hypothèses fortes sur la nature statistique des données.
+
+Par exemple, reprenons l'exemple précédent après avoir rajouté 10 variables aléatoire sans rapport avec le prix ou la surface au jeu de données `X`. *(à faire en exercice)*
+
+
+\newpage 
+
+
+# Exemples
+
+http://www.ats.ucla.edu/stat/examples/rwg/
+http://www.math.hope.edu/swanson/
+http://www.math.hope.edu/swanson/data/body_temp.txt
+http://www.ats.ucla.edu/stat/r/modules/raw_data.htm
+http://www.statsci.org/datasets.html
+http://www.stat.ufl.edu/~winner/datasets.html
+
+# Références
+
+
+
+
+
+```{r garb, echo=F, eval=F}
+download.file( "http://www.statsci.org/data/books/hamilton.zip", temp <- tempfile() )
+data <- read.table(unz(temp, "ACIDITY.RAW"))
+data
+data <- read.table(unz(temp, "AIRPOL.RAW"))
+data <- read.table(unz(temp, "CORM.RAW"))
+COLNAMES(DATA) <- C("colony", "pop", "area")
+COLNAMES(data) <- C("colony", "pop", "area")
+COLNAMES(data) <- c("colony", "pop", "area")
+colnames(data) <- c("colony", "pop", "area")
+plot(pop ~ area, data=data)
+data <- read.table(unz(temp, "KITT.RAW"))
+data
+plot(data[,1], data[,1])
+plot(data[,3], data[,2])
+lm(data[,3], data[,2])
+lm(data[,3] ~ data[,2])
+summary(lm(data[,3] ~ data[,2]))
+abline(lm(data[,3] ~ data[,2]))
+abline(lm(data[,3] ~ data[,2]), col=2)
+data <- read.table(unz(temp, "MANATEE.RAW"))
+data
+plot(data[,3], data[,4])
+lm(data[,3] ~ data[,4])
+summary(lm(data[,3] ~ data[,4]))
+1.1483 / 0.2311
+xx <- rnorm(1000)
+yy <- 2*xx + 0.1*rnorm(1000)
+
+
+abline(lm(data[,3] ~ data[,2]))
+abline(lm(data[,3] ~ data[,2]), col=2)
+data <- read.table(unz(temp, "MANATEE.RAW"))
+data
+plot(data[,3], data[,4])
+lm(data[,3] ~ data[,4])
+summary(lm(data[,3] ~ data[,4]))
+1.1483 / 0.2311
+xx <- rnorm(1000)
+yy <- 2*xx + 0.1*rnorm(1000)
+summary(lm(yy ~ xx))
+2.002241 / 0.003227
+plot(data[,3], data[,4], col=as.numeric(data[,3]))
+data
+plot(data[,3], data[,4], col=as.numeric(data[,5]))
+plot(data[,3], data[,4], col=as.numeric(data[,5]), asp=1)
+plot(data[,3], data[,4], col=as.numeric(data[,5]), asp=1) ; grid() ; abline(0, 1, lty=2)
+plot(data[,3], data[,4], col=as.numeric(data[,5]), asp=1) ; grid() ; abline(0, 1, lty=2, col="grey")
+plot(data[,3], data[,4], col=as.numeric(data[,5]), asp=1) ; grid() ; abline(0, 1, lty=3, col="grey")
+
+
+require(pheatmap)
+pheatmap(as.matrix(b))
+pheatmap(as.matrix(b), scale="both")
+pheatmap(as.matrix(b), scale="column")
+pheatmap(t(as.matrix(b)), scale="column")
+pheatmap(t(as.matrix(b)), scale="row")
+pheatmap(t(as.matrix(b)), scale="row",legend=data.frame(gender=a$sex))
+pheatmap(t(as.matrix(b)), scale="row",annotation=data.frame(gender=a$sex))
+pheatmap(t(as.matrix(b)), scale="row",annotation=data.frame(gender=a$sex),cellheight=1)
+pheatmap(t(as.matrix(b)), scale="row",annotation=data.frame(gender=a$sex),cellheight=10)
+cor(b)
+pheatmap(t(as.matrix(b)), scale="none",annotation=data.frame(gender=a$sex),cellheight=10)
+plot(height ~ weight, data=b, col=x$sex)
+plot(height ~ weight, data=b, col=as.numeric(x$sex))
+plot(height ~ weight, data=b, col=as.numeric(a$sex))
+plot(reportedHeight ~ reportedWeight, data=b, col=as.numeric(a$sex))
+plot(reportedHeight ~ Height, data=b, col=as.numeric(a$sex))
+plot(reportedHeight ~ height, data=b, col=as.numeric(a$sex))
+pca <- prcomp(b, scale=TRUE)
+plot(pca$x[,1:2], col=as.numeric(a$sex))
+plot(pca)
+plot(pca$x[,1:2], col=as.numeric(a$sex))
+pca <- prcomp(b)
+plot(pca$x[,1:2], col=as.numeric(a$sex))
+
+
+
+plot(pca$x[,1:2], col=as.numeric(a$sex))
+pca <- prcomp(b)
+plot(pca$x[,1:2], col=as.numeric(a$sex))
+pc1 <- acp$x[,1]
+pc1 <- pca$x[,1]
+b$diffHeight <- b$height - b$reportedHeight
+t.test(b$diffHeight ~ a$sex)
+dim(a)
+dim(b)
+dim(aa)
+t.test(b$diffHeight ~ aa$sex)
+boxplot(b$diffHeight ~ aa$sex)
+t.test(b$diffWeight ~ aa$sex)
+b$diffWeight <- b$weight - b$reportedWeight
+t.test(b$diffWeight ~ aa$sex)
+boxplot(b$diffWeight ~ aa$sex)
+plot(density(b$diffWeight[aa$sex=="female"]))
+plot(density(b$diffWeight[aa$sex=="F"]))
+hist(b$diffWeight[aa$sex=="F"])
+d <- read.table("clipboard")
+d
+plot(d[,2:3])
+plot(d[,2:3], log="xy")
+head(log(d[,2:3]))
+summary(lm(V3~V2, data=log(d[,2:3])))
+cor(log(d[,2:3]))
+abline(lm(V3~V2, data=log(d[,2:3])))
+plot(log(d[,2:3]))
+abline(lm(V3~V2, data=log(d[,2:3])))
+cor((d[,2:3]))
+plot(lm(V3~V2, data=log(d[,2:3])))
+abline(lm(V3~V2, data=(d[,2:3])))
+plot(lm(V3~V2, data=(d[,2:3])))
+summary(lm(V3~V2, data=(d[,2:3])))
+
+```
 
