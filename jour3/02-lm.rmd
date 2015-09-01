@@ -1,0 +1,31 @@
+---
+title: "Modèle linéaire en R"
+subtitle: "Rapide Introduction à R"
+author: "Vincent Guillemot"
+date: "Jeudi 10 sept. 2015"
+output: ioslides_presentation
+---
+
+## Modèle linéaire simple
+
+## Modèle linéaire multivarié
+
+## Equivalence
+
+Les données sont $X$ (matrice des variables explicatives) et $y$ (variable à expliquer). 
+
+ * Quand les données sont centrées : \[ \hat \beta = (X^\top X)^{-1} X^\top y.\]
+ * Quand les données ne sont pas centrées, on ajoute une colonne de 1 à $X \mapsto X_1$ 
+ \[ \hat \beta_1 = (X_1^\top X_1)^{-1} X_1^\top y\]
+
+## Exercice 1
+
+Générez des données simulées et vérifiez que les formules ci-dessus sont correctes.
+
+## Régression avec des facteurs
+
+
+
+## Exercice 2
+
+http://www.stat.ufl.edu/~winner/data/brainhead.txt

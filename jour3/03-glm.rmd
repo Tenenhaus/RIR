@@ -1,0 +1,18 @@
+---
+title: "Modèles linéaires généralisés"
+subtitle: "Rapide Introduction à R"
+author: "Vincent Guillemot"
+date: "Jeudi 10 sept. 2015"
+output: ioslides_presentation
+---
+
+## La fonction `glm`
+
+## Exemple: la régression logistique
+
+http://stats.stackexchange.com/questions/168637/logistic-regression-what-happens-to-the-coefficients-when-we-switch-the-labels
+
+
+## Exercice 1
+
+## Exercice 2

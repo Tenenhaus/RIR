@@ -7,15 +7,22 @@ header-includes :
 bibliography: jour3.bib
 ---
 
-## Exercice 1 : Faire un rapport en R Markdown
+## Exercice : Faire un rapport en R Markdown
 
  * Créez un rapport en R Markdown basé sur le _template_ proposé par RStudio.
 
+## Exercice : Faire un tableau dans un document en R Markdown
+
+ 1. Créez un document R Markdown :
+   + dont le titre est "Evolution de la moyenne en fonction de la taille de l'échantillon",
+   + sans auteur,
+   + qui aura comme *output* un `html_codument`.
+ 2. Créez un *chunk* de code R contenant la génération de trois échantillons $\mathcal N(0,1)$ de tailles 10, 100 et 1000 et le calcul de la moyenne de ces trois échantillons.
+ 3. En vous aidant du guide *Markdown Quick Reference*, créez un tableau à 2 colonnes présentant
+   + en colonne 1, la taille des trois échantillons,
+   + en colonne 2, les moyennes calculées.
+
 # Modèles linéaires simples
-
-# Exercice : Cerveaux des mammifères [@Allison1976]
-
-http://people.sc.fsu.edu/~jburkardt/datasets/regression/x01.txt
 
 # Exercice : Poids et Tailles
 
@@ -25,6 +32,17 @@ Dans une étude de [1990 de Caroline Davis sur l'image de soi parue dans le revu
  2. Faites deux graphes côte-à-côte de le taille en fonction du poids mesurés ou reportés.  
  3. Pouvez-vous identifier un *outlier* ? Pour cela, vous pouvez éventuellement chercher une fonction pour vous aider dans la librairie [`car`](https://cran.r-project.org/web/packages/car/index.html).
  4. Sur le même graphe, représentez la taille en fonction du poids mesurée et reportée. Utilisez la fonction `arrows` pour mieux visualiser les différences.
+
+# Exercice : Cerveaux des mammifères [@Allison1976]
+
+Des mesures du poids du cerveau et du poids total du corps oint été effectuées chez 62 mammifères [@Allison1976].
+Nous cherchons à constuire un modèle sans *intercept* (car un animal de poids nul aura certainement un cerveau de poids nul).
+
+ 1. Lisez les données se trouvant [ici](http://people.sc.fsu.edu/~jburkardt/datasets/regression/x01.txt) avec la fonction `read.table`. L'argument `skip` vous aidera à extraire les données !
+ 2. Renommez les trois colonnes en `ID`, `brain` et `total` avec la fonction `colnames`. 
+
+
+
 
 # Exercice : Contraste
 
@@ -49,7 +67,7 @@ Dans une étude de [1990 de Caroline Davis sur l'image de soi parue dans le revu
 
 On peut construire `X` en utilisant la fonction `read.csv` :
 ```{r}
-X <- read.csv("appart.csv")
+X <- read.table("appart.txt", header=TRUE, row.names=1)
 ```
 
 Obtenir le plot bivarié s'obtient très rapidement avec la fonction `plot` :
@@ -109,12 +127,12 @@ Par exemple, reprenons l'exemple précédent après avoir rajouté 10 variables 
 
 # Exemples
 
-http://www.ats.ucla.edu/stat/examples/rwg/
-http://www.math.hope.edu/swanson/
-http://www.math.hope.edu/swanson/data/body_temp.txt
-http://www.ats.ucla.edu/stat/r/modules/raw_data.htm
-http://www.statsci.org/datasets.html
-http://www.stat.ufl.edu/~winner/datasets.html
+ * http://www.ats.ucla.edu/stat/examples/rwg/
+ * http://www.math.hope.edu/swanson/
+ * http://www.math.hope.edu/swanson/data/body_temp.txt
+ * http://www.ats.ucla.edu/stat/r/modules/raw_data.htm
+ * http://www.statsci.org/datasets.html
+ * http://www.stat.ufl.edu/~winner/datasets.html
 
 # Références
 
