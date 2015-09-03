@@ -8,24 +8,71 @@ output: ioslides_presentation
 
 ## Test d'hypothèse
 
- * Hypothèse nulle
- * Hypothèse alternative
- * Risque de 1ère espèce
- * Risque de 2ème espèce
- * Appariement
+ * Hypothèse nulle : généralement un _statu quo_
+ * Hypothèse alternative : généralement ce que l'on veut montrer
+ * Risque de 1ère espèce : $\alpha$, probabilité de rejeter l'hypothèse nulle à tort
+ * Risque de 2ème espèce : $\beta$, probabilité de ne pas rejeter l'hypothèse nulle à tort
+ * Appariement : avant/après, jumeaux etc.
  
 ## Statistique
 
+> Un estimateur d'un paramètre de population est appelé une *statistique*. [@Zar1990]
+
+ * Calculée à partir des mesures.
+ * Dépend de la taille de l'échantillon.
+ * Suit une certaine loi
+   + tabulée ou non,
+   + approximée ou non,
+   + sous certaines hypothèses sur la distribution de l'échantillon ou non.
+
+Caractéristique importante : le _*nombre de degrés de liberté*_ (souvent noté `df`).
+
 ## p-valeur
+
+ > Hypothèses : une statistique $S$ suit une certaine loi $f$. Après calculs, pour notre échantillon, la valeur de la statistique vaut $s$. *Si l'hypothèse nulle était vraie, quelle serait la probabilité d'obtenir une valeur égale ou plus grande que $s$ ?*
+
+```{r, echo=F, fig.align="center"}
+par(family="sans")
+plot(dnorm, xlim=c(-4,4), axes=F, xlab="", ylab=expression(f), lwd=2)
+grid()
+t1 <- seq(-4,-1.96, l=100)
+t2 <- seq(1.96,4, l=100)
+polygon(c(t1, rev(t1)), c(dnorm(t1),rep(0,100)), col=scales::alpha("steelblue",0.5), border = NA)
+polygon(c(t2, rev(t2)), c(dnorm(t2),rep(0,100)), col=scales::alpha("steelblue",0.5), border = NA)
+axis(side = 1,at = 1.96*c(-1,1), labels = c("-s","s"),tick = F)
+```
 
 ## Exemples
 
 Paramétriques | Non-paramétriques
 ---|---
 `t.test` | `wilcox.test`
+`aov` | `kruskal.test`
+`var.test` | `ansari.test`
+`bartlett.test` | `fligner.test `
+`cor.test` | `cor.test `
 
 ## Utilisation de `~`
 
+Les formules peuvent également s'utiliser pour spécifier à R la structure des
+données dans l'utilisation d'un test.
+
+```{r, eval=F}
+data("PlantGrowth")
+pg <- PlantGrowth
+kruskal.test(weight ~ group, data=pg)
+```
+
 ## Exercice 1
 
+Comptez le nombre d'utilisateurs de Mac dans la salle. Comparez la proportion des utilisateurs de Mac (avec un test de comparaison des proportions) à une valeur théorique de 50%.
+
 ## Exercice 2
+
+ 1. Stockez dans une matrice 1000 échantillons gaussiens ($\sim \mathcal N(0,1)$) de taille 20.
+ 2. Pour chacun de ces échantillons, faites un t-test de comparaison des moyennes entre deux sous-ensembles de taille 10.
+ 3. Représentez côte à côte :
+    + l'histogramme des _p-values_,
+    + et la courbe des _p-values_ ajustées (`p.adjust`) en fonction des _p-values_.
+
+

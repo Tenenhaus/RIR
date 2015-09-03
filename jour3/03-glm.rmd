@@ -8,11 +8,20 @@ output: ioslides_presentation
 
 ## La fonction `glm`
 
+La fonction `glm` permet d'ajuster des modèles linéaires __*généralisés*__ : 
+
+ * régression logistique,
+ * régression de poisson,
+ * _régression dans un cadre gaussien_...
+
+L'utilisation de `glm` est similaire à celle de `lm`.
+
 ## Exemple: la régression logistique
 
-http://stats.stackexchange.com/questions/168637/logistic-regression-what-happens-to-the-coefficients-when-we-switch-the-labels
+Les données sont : 
 
+ * `X`, la matrice des variables explicatives,
+ * `y`, une variable binaire.
 
-## Exercice 1
+La commande R : `glm( y ~ X, family=binomial)`.
 
-## Exercice 2

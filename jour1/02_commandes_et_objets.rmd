@@ -141,6 +141,31 @@ L <- list(1:10, b=3, f=cos, char=letters[5:7])
 names(L)
 ```
 
+## Bloc de code
+
+Un _bloc_ permet de rassembler plusieurs commandes ensembles pour les exécuter d'un coup !
+
+Un bloc est délimité par des accolades :
+
+```{r}
+{
+  a <- 1
+  b <- 2
+}
+```
+
+On utilise ce concept pour
+ * déclarer une fonction,
+ * faire des boucles `for`, `while`...
+ * dans des structures conditionnelles.
+
+## Fonctions
+
+ * Syntaxe : `f <- function(arg1=, ...) {Bloc de commandes}`.
+ * Objets retournés par `f` : avec la commande `return`. 
+ * Que peut-on retourner ? Ce que l'on veut (dans une `list`).
+ * Attention à l'indentation !
+
 ## Exercices
 
 * Créer une matrice de nombres aléatoires (`rnorm`).
@@ -148,6 +173,7 @@ names(L)
 * Quels sont les éléments > 0 ?
 * Créer une deuxième matrice de mêmes dimensions, mais remplie de 1.
 * La coller à la première (`rbind` ou `cbind`)
+* Créer une fonction qui permet de calculer le carré et la racine carrée d'un réel positif.
 
 # Statistiques classiques en R
 
@@ -182,3 +208,7 @@ plot(ecdf(rnorm(10)), xlab="x", main="")
 ## Diagramme de Tukey ou `boxplot`
 
 Le diagramme de Tukey, ou `boxplot` permet de représenter de manière synthétique les quartiles d'un échantillon.
+
+```{r}
+boxplot(rnorm(10), xlab="x", main="")
+```

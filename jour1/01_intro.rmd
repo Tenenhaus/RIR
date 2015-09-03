@@ -83,6 +83,16 @@ x <- rnorm(100)
 mean(x)
 ```
 
+## DataJoy
+
+Pour rendre les exercices interactifs, nous allons utiliser DataJoy!
+
+https://www.getdatajoy.com
+
+
+
+
+
 ## Supports de cours -- GitHub
 
 https://github.com/PF-BB/RIR

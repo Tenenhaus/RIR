@@ -8,7 +8,57 @@ output: ioslides_presentation
 
 ## Modèle linéaire simple
 
+Le modèle linéaire simple permet de répondre à la question : est-ce que deux variables sont liées par une relation linéaire.
+
+La forme du modèle est la suivante :
+\[Y = a + b X + \varepsilon,\]
+avec $\varepsilon$ une variable aléatoire qui représente les résidus.
+
+*En R :* `y ~ x`.
+
 ## Modèle linéaire multivarié
+
+Le modèle linéaire multiple (ou multivarié) permet de répondre à la question : est-ce qu'une variable à expliquer $Y$ peut être représentée par une combinaison linéaire de variables explicatives $X_i$.
+
+La forme du modèle est la suivante :
+\[Y = a + \sum_i b_i X_i + \varepsilon,\]
+avec $\varepsilon$ une variable aléatoire qui représente les résidus.
+
+*En R :* `y ~ x1 + x2 + x3` ou bien `y ~ .`
+
+## La formule
+
+C'est la façon de communiquer à R le modèle à considérer. Les symboles principaux qui la constituent sont :
+
+Symbole | Signification
+-----|--------
+`~` | Partage la formule en variables à expliquer à gauche et variables explicatives à droite.
+`+` | Ajout de la variable qui suit. `y ~ x1 + x2`
+`.` | Ajoute toutes les variables. ` y ~ .`
+`:` | Ajoute un terme d'interaction entre deux variables. `y ~ x:z`.
+`*` | Ajoute les deux variables plus un terme d'interaction entre deux variables. `y ~ x*z` équivaut à `y ~ x + z + x:z`.
+
+## ... suite
+
+Symbole | Signification
+-----|--------
+`^` | Permet de spécifier des termes d'interaction de différents degrés.
+`-` | Retrait de la variable qui suit. `y ~ . - z`.
+` - 1` | Retrait de l'intercept.
+`0 + ` | Retrait de l'intercept.
+
+Avec la fonction `I`, on peut construire des variables à ajouter dans le modèle directement dans la formule.
+Par exemple `y ~ x + I( 2*x^2 / log(z) )`.
+
+## Exemple d'utilisation
+
+```{r, eval=FALSE}
+x <- rnorm(100) ; z <- rnorm(100)
+y <- -1 + 2*x + 3*x*z + rnorm(100, sd = 0.1)
+
+lm(y ~ x * z)
+lm(y ~ x * z - z)
+```
 
 ## Equivalence
 
@@ -24,8 +74,27 @@ Générez des données simulées et vérifiez que les formules ci-dessus sont co
 
 ## Régression avec des facteurs
 
+Les facteurs sont transformés en variables binaires !
 
+Exemple :
+
+```{r, eval=FALSE}
+AB <- factor(rep(letters[1:2], 50))
+ABbin <- rep(0:1, 50)
+lm(y ~ AB)
+lm(y ~ ABbin)
+```
+
+Pour faire la transformation, on choisit une modalité de référence, et on construit une variable par modalité restante : cette variable vaut 1 quand le facteur correspond à la modalité, et 0 sinon.
 
 ## Exercice 2
 
-http://www.stat.ufl.edu/~winner/data/brainhead.txt
+Reprendre l'exemple précédent en construisant avec un facteur `ABCD` contenant 4 modalités.
+
+## Exercice 3
+
+ 1. Lisez les données se trouvant à cette adresse http://www.stat.ufl.edu/~winner/data/brainhead.txt
+ 2. Lisez la description des données : http://www.stat.ufl.edu/~winner/data/brainhead.txt
+ 3. Renommez les colonnes de la matrice des données en fonction des informations qui vous sont données.
+ 4. Construisez un modèle linéaire décrivant le lien entre poids du cerveau et volume de la boîte cranienne en incluant également le sexe et l'âge.
+ 5. Faites également un diagramme de Tukey des données.
