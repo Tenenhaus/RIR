@@ -14,8 +14,7 @@ x <- rnorm(100)
 mean(x)
 var(x)
 ```
- - Rappels de Biostatistique sur les modèles linéaires...
- \[\bar x = \frac{1}{n}\sum_{i=1}^n x_i, ~ s^2 = \frac{1}{n-1}\sum_{i=1}^n \left( x_i - \bar x \right)^2\]
+ - Comment ajuster des modèles linéaires en R.
 
 
 
