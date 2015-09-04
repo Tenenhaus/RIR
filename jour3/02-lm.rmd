@@ -87,6 +87,20 @@ lm(y ~ ABbin)
 
 Pour faire la transformation, on choisit une modalité de référence, et on construit une variable par modalité restante : cette variable vaut 1 quand le facteur correspond à la modalité, et 0 sinon.
 
+## Que faire après l'exécution de la commande `lm`
+
+```{r, eval=FALSE}
+res <- lm(y ~ x, data=tableau)
+```
+
+Fonction | Description
+---|---
+`plot` | Pour produire des graphiques de diagnostique: `?plot.lm`.
+`summary` | Pour faire des tests sur les coefficients, calculer un $R^2$ etc. 
+`aov` | Pour faire une ANOVA. 
+`abline` | Pour ajouter la droite de régression à un graphe existant.
+
+
 ## Exercice 2
 
 Reprendre l'exemple précédent en construisant avec un facteur `ABCD` contenant 4 modalités.

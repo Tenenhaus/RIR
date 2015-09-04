@@ -175,40 +175,113 @@ On utilise ce concept pour
 * La coller à la première (`rbind` ou `cbind`)
 * Créer une fonction qui permet de calculer le carré et la racine carrée d'un réel positif.
 
-# Statistiques classiques en R
+# Structures de controle
 
-## Moyenne etc.
+Boucles, conditions, répétitions etc.
 
-Pour obtenir des estimateurs ponctuels, différentes solutions sont possibles :
+## Boucle `for`
 
-* `mean`, `var`, `sd`...
-* `quantile`
-* `summary`
+Répéter un bloc de code, qui dépend d'un itérateur `i`, `n` fois.
 
-Toutes permettent de gérer les données manquantes
+```{r, eval=FALSE}
+require(tm)
+aveu <- removePunctuation(scan("phedre.txt",what = ""))
+nba <- 0 ; nbe <- 0 ; nbi <- 0 ; nbo <- 0 ; nbu <- 0
+ 
+for (mot in aveu) {
+  nba <- nba + pmax(0, gregexpr("a", mot)[[1]][1])
+  nbe <- nbe + pmax(0, gregexpr("e", mot)[[1]][1])
+  nbi <- nbi + pmax(0, gregexpr("i", mot)[[1]][1])
+  nbo <- nbo + pmax(0, gregexpr("o", mot)[[1]][1])
+  nbu <- nbu + pmax(0, gregexpr("u", mot)[[1]][1])
+}
 
-## Histogramme
-
-```{r}
-hist(rnorm(10), xlab="x", main="")
+c(a=nba, e=nbe, i=nbi, o=nbo, u=nbu)
 ```
 
-## Diagramme en bâtons
 
-```{r}
-barplot(c(a=10,b=4,c=6))
+## `if`, `else`
+
+Le générateur aléatoire de p-valeurs :
+
+```{r, eval=FALSE}
+
+r <- runif(1)
+
+if (r < 0.05) {
+  print("Youpi !")
+} else if (r < 0.1) {
+  print("J'ai confiance quand même !")
+} else {
+  print(" :'( ")
+}
+
+
 ```
 
-## Fonction de répartition empirique
 
-```{r}
-plot(ecdf(rnorm(10)), xlab="x", main="")
+
+## Boucle `while`
+
+```{r,  eval=FALSE}
+require(sfsmisc)
+
+digits <- function(n, base = 10) as.vector(digitsBase(n, base = base))
+# digits(1234)
+
+k <- 10
+
+while (k < 100000) {
+  if ( sum(digits(k)) == prod(digits(k))  ) break
+  k <- k+1
+}
+
+sprintf("Le résultat vaut %i", k)
 ```
 
-## Diagramme de Tukey ou `boxplot`
 
-Le diagramme de Tukey, ou `boxplot` permet de représenter de manière synthétique les quartiles d'un échantillon.
 
-```{r}
-boxplot(rnorm(10), xlab="x", main="")
+## Boucle `repeat`
+
+
+```{r, eval=F}
+require(sfsmisc)
+
+digits <- function(n, base = 10) as.vector(digitsBase(n, base = base))
+# digits(1234)
+
+k <- 10
+
+repeat {
+  if ( sum(digits(k)) == prod(digits(k))  ) break
+  if (k > 100000) break
+  k <- k+1
+}
+
+sprintf("Le résultat vaut %i", k)
 ```
+
+
+
+## `ifelse`, `switch`
+
+
+```{r, eval=F}
+a <- "Cake"
+b <- "Cabbage"
+```
+
+
+```{r, eval=F}
+ifelse(a == "Cake", "Num, num", ":(")
+ifelse(b == "Cake", "Num, num", ":(")
+```
+
+```{r, eval=F}
+switch(a, Cake="Num, num", Candy="Sweet !", Cabbage="Ew!")
+switch(b, Cake="Num, num", Candy="Sweet !", Cabbage="Ew!")
+switch("Tomato", Cake="Num, num", Candy="Sweet !", Cabbage="Ew!")
+res <- switch("Tomato", Cake="Num, num", Candy="Sweet !", Cabbage="Ew!")
+# NULL
+```
+

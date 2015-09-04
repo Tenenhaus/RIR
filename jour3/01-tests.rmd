@@ -71,7 +71,8 @@ Comptez le nombre d'utilisateurs de Mac dans la salle. Comparez la proportion de
 
  1. Stockez dans une matrice 1000 échantillons gaussiens ($\sim \mathcal N(0,1)$) de taille 20.
  2. Pour chacun de ces échantillons, faites un t-test de comparaison des moyennes entre deux sous-ensembles de taille 10.
- 3. Représentez côte à côte :
+ 3. Comptez le nombre de p-valeurs inférieures au seuil de 0.05 (i.e. le nb d'hypothèses nulles rejetées).
+ 4. Représentez côte à côte :
     + l'histogramme des _p-values_,
     + et la courbe des _p-values_ ajustées (`p.adjust`) en fonction des _p-values_.
 
