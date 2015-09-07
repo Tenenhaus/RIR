@@ -178,6 +178,6 @@ Il y a énormément de paramètres graphiques que l'on peut modifier, on ne peut
 
 On peut cependant les consulter en appelant l'aide de la fonction `par` : `?par`.
 
-> * Parfois, ce qui parait etre un simple détail peut prendre des heures à modifier en utilisant des paramètres graphique !*
+> _Parfois, ce qui parait etre un simple détail peut prendre des heures à modifier en utilisant des paramètres graphique !_
 
 

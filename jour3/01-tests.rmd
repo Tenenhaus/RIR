@@ -21,9 +21,9 @@ output: ioslides_presentation
  * Calculée à partir des mesures.
  * Dépend de la taille de l'échantillon.
  * Suit une certaine loi
-   + tabulée ou non,
-   + approximée ou non,
-   + sous certaines hypothèses sur la distribution de l'échantillon ou non.
+    + tabulée ou non,
+    + approximée ou non,
+    + sous certaines hypothèses sur la distribution de l'échantillon ou non.
 
 Caractéristique importante : le _*nombre de degrés de liberté*_ (souvent noté `df`).
 

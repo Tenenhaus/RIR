@@ -155,6 +155,7 @@ Un bloc est délimité par des accolades :
 ```
 
 On utilise ce concept pour
+
  * déclarer une fonction,
  * faire des boucles `for`, `while`...
  * dans des structures conditionnelles.
