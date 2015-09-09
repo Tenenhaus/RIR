@@ -14,7 +14,6 @@ vignettes/*.pdf
 
 # produced files
 *.html
-*.pdf
 
 # save
 *~

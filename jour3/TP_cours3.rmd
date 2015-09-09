@@ -1,0 +1,293 @@
+---
+title: "Analyse statistique avec R"
+author: "Arthur Tenenhaus"
+date: "Monday, September 07, 2015"
+output: pdf_document
+---
+
+# La R?gression multiple
+
+La r?gression mutiple est une m?thode statistique adapt?e ? l'?tude de la liaison entre une variable quantitative $Y$ et un ensemble de $p$ variables explicatives $X_1, X_2, \ldots, X_p$ quantitatives ou qualitatives. L'exemple compagnon de cette s?ance, \textbf{pr?vision du prix d'une automobile}, servira ? illustrer cette m?thode.
+
+Les commandes suivantes permettent de charger et mettre en forme le jeu de donn?es AUTO.
+
+```{r, warning=FALSE, message=FALSE}
+library(gdata)
+library(pheatmap)
+A = read.table("AUTO.csv", header=TRUE, sep="\t")
+rownames(A) = A[, 1]
+A = A[, -1]
+head(A)
+```
+
+On se propose de construire un mod?le de pr?diction du prix d'une automobile ? partir des `r NCOL(A)-1` variables caract?ristiques suivantes. 
+
+```{r}
+colnames(A)[-7]
+```
+
+Ces variables ont ?t? mesur?es sur `r NROW(A)` automobiles.
+
+##Analyse exploratoire des donn?es
+
+Toute bonne mod?lisation doit ?tre pr?c?d?e d'une ?tape d'analyse 
+exploratoire des donn?es. L'objectif de cette analyse exploratoire 
+est de mat?rialiser au travers de figures de m?rite et d'indicateurs 
+le contenu des donn?es. La figure suivante renvoie l'ensemble des graphes 
+bivari?s, la taille des points refl?tant la valeur de la variable ? expliquer.
+
+```{r, fig.align='center', fig.height=8, fig.width=8}
+pairs(A[, -7], cex = exp(A$PRIX/min(A$PRIX)-1), )
+```
+
+La figure suivante permet de visualiser la structure de corr?lation 
+et les relations entre variables.
+
+```{r, fig.align='center', fig.height=8, fig.width=8}
+pheatmap(cor(A), display_numbers = TRUE)
+```
+
+On constate que les variables CYL, PUI et VITESSE sont corr?l?es entre elles 
+tout comme LAR, LON et POIDS.
+
+Cette structure de corr?lation entre variables est ?galement exhib?? gr?ce ? l'analyse
+en composante principale (ACP). La commande suivante permet de r?aliser une ACP
+
+```{r}
+res.pca = princomp(A, cor = TRUE)
+summary(res.pca)
+```
+
+La variance de la composante s'obtient ?galement par la commande suivante
+
+```{r}
+apply(res.pca$scores, 2, function(x) sd(x)*sqrt((NROW(A)-1)/(NROW(A))))
+```
+
+La variance cumul?e s'obtient comme suit:
+
+```{r}
+variance = apply(res.pca$scores, 2, function(x) var(x)*(NROW(A)-1)/(NROW(A)))
+cumsum(variance)/sum(variance)
+```
+
+On constate que les deux premi?res composantes capturent pr?s de 85\% 
+de l'information pr?sente dans les donn?es. On en d?duit qu'une repr?sentation 
+des donn?es sur le premier plan principal fournit une bonne approximation des 
+relations entre individus.  
+
+Le biplot associ? est repr?sent? ci-dessous
+
+```{r, fig.align='center', fig.height=8, fig.width=8}
+biplot(res.pca, cex = .6)
+```
+
+# Calcul manuel des coefficients de r?gression et via la fonction lm()
+```{r}
+y = A$PRIX
+X = cbind(1, as.matrix(A[, -7]))
+colnames(X) = c("Intercept", "CYL", "PUI", "LON", "LAR", "POIDS", "VITESSE")
+beta_hat = solve(t(X)%*%X)%*%t(X)%*%y
+beta_hat
+```
+
+```{r}
+res.lm = lm(PRIX ~ ., data = A)
+summary(res.lm)
+```
+
+On constate que les deux approches conduisent aux m?mes coefficients de r?gression. 
+
+\textbf{Il faut en permanence conserver un esprit critique sur les mod?les g?n?r?s} : 
+L'examen des coefficients de r?gression et leur niveau de significativit? nous conduit 
+? rejeter le mod?le. En effet, contrairement ? ce que nous laissait conclure l'analyse 
+exploratoire des donn?es, aucune des variables n'est significative. De plus, les signes des 
+coefficients de r?gression associ?s ? CYL, LON et VITESSE ne sont pas en coh?rence avec 
+l'intuition. D'o? peut provenir le probl?me ? 
+
+Comme discut? ci-dessous, la matrice de corr?lation montre une forte corr?lation 
+entre variables. Or, nous savons que $\widehat{\text{var}}(\hat{\boldsymbol{\beta}}) 
+=\sigma^2 \left(\mathbf{X}^t \mathbf{X} \right)^{-1}$, et donc la variance de 
+l'estimateur des moindres carr?es peut exploser en pr?sence de fortes multicolin?arit?s 
+entre variables. Il faut donc, parmi les paquets de variables corr?l?es, s?lectionner un 
+repr?sentant de chaque. Pour ce faire, nous proposons l'utilisation d'une approche de type stepwise.
+
+```{r}
+step(res.lm, direction = "backward")
+```
+
+Les variables PUI et POIDS sont conserv?es dans le mod?le final.
+
+```{r}
+res.final = lm(PRIX~PUI+POIDS, data = A)
+summary(res.final)
+```
+
+
+
+```{r}
+plot(A$PUI, A$POIDS, col = "white", cex = A$PRIX, xlim = c(45, 135))
+text(A$PUI, A$POIDS, paste(rownames(A), "(", A$PRIX, ")", sep = ""), cex = .6)
+```
+
+
+
+# La r?gression logistique
+
+La r?gression logistique est une m?thode statistique adapt?e ? l'?tude de la liaison entre une variable qualitative $Y$ et un ensemble de $p$ variables explicatives $X_1, X_2, \ldots, X_p$ quantitatives ou qualitatives. L'exemple compagnon de cette s?ance, \textbf{pr?vision de la faillite d'entreprises}, servira ? illustrer cette m?thode.
+
+
+## Pr?sentation des donn?es et notations 
+
+On se propose de construire un mod?le de pr?vision de la faillite d'une entreprise ? partir de donn?es financi?re r?colt?es par R.A. Johnson et D.W. Wichern en 1982. Ces donn?es financi?res annuelles ont ?t? recueillies sur $21$ entreprises approximativement deux ans avant leur faillite, et, ? peu pr?s ? la m?me ?poque, sur 25 soci?t?s financi?rement solides. Les donn?es r?unissent, pour chaque entreprise, deux ratios financiers et leur situation deux ans plus tard : 
+
+variable        | Signification
+-------------   | -------------
+$\mathbf{x}_1$  | Flux de tr?sorerie / Dette totale
+$\mathbf{x}_2$  | Actif ? court terme / Dette ? court terme
+$\mathbf{y}$    | Faillite (1), non faillite (0)
+
+## Chargement des donn?es
+
+```{r}
+A = read.table("faillite.txt", 
+               header = TRUE)
+X = as.matrix(A[, c(2,4)])
+y = A[, 6]
+head(cbind(X, y))
+```
+
+## Visualisation de donn?es
+
+Toute bonne mod?lisation doit ?tre pr?c?d?e d'une ?tape d'analyse exploratoire 
+des donn?es. L'objectif de cette analyse exploratoire est de mat?rialiser au 
+travers de figures de m?rite et d'indicateurs le contenu des donn?es. La figure 
+suivante renvoie le graphe bivari? ($\mathbf{x}_1$, $\mathbf{x}_2$), la couleur/forme 
+des points refl?tant la valeur de la variable ? expliquer.
+
+```{r}
+plot(X, 
+     bg = c("red", "green3")[as.factor(y)], 
+     pch = c(21, 25)[as.factor(y)], 
+     main = "Faillite d'une entreprise", 
+     xlab = "Flux de tr?sorerie/Dette totale (x1)", 
+     ylab = "Actif ? court terme/Dette ? court terme (x2)"
+)
+```
+
+Il semble que ces deux variables soient porteuses d'information discriminante.
+
+on s'int?resse maintenant aux deux variables s?par?ment. Les bo?tes ? 
+moustaches des deux ratios financiers selon le crit?re de faillite sont 
+pr?sent?s sur la figure suivante. La bo?te ? moustache permet de visualiser 
+de mani?re tr?s compacte la dispersion des donn?es. La bo?te centrale est 
+construite ? partir du premier et du troisi?me quartile et est partag?e par 
+la m?diane. Les "moustaches" vont du premier quartile au minimum et du troisi?me 
+quartile au maximum. Par convention, les moustaches ne doivent pas d?passer 
+une fois et demi la distance interquartile. Si les points extr?mes sont trop 
+loin des quartiles, ils appara?tront comme isol?s (outliers) sur le graphique.
+
+
+```{r, fig.height = 8, fig.width=8 }
+layout(matrix(t(1:2), 1, 2))
+boxplot(X[, 1]~factor(y, 
+                      labels = c("non faillite", "faillite")), 
+                      ylab = "Flux de tr?sorerie/Dette totale")
+boxplot(X[, 2]~factor(y, 
+                      labels = c("non faillite", "faillite")), 
+                      ylab = "Actif ? court terme/Dette ? court terme")
+```
+
+
+## L'algorithme de Newton-Raphson pour la r?gression logistique
+
+Les param?tres du mod?le sont estim?s par maximum de vraisemblance. 
+L'algorithme utilis? pour trouver l'estimateur du maximum de vraisemblance 
+est l'algorithme de Newton-Raphson. 
+
+Posons $\pi_i = P(Y=1|X= \boldsymbol{x}_i)$, $\mathbf{X}$ la matrice form?e 
+d'une premi?re colonne de coordonn?es constantes ?gales ? 1 et des $2$ colonnes 
+correspondant aux variables $\mathbf{x}_1$, $\mathbf{x}_2$ observ?es sur les $n$ 
+individus et $\mathbf{V}$ la matrice diagonale form?e des $\pi_i(1-\pi_i)$. 
+Enfin, notons $\boldsymbol{\pi}$ le vecteur de probabilit?s tel que le i?me 
+?l?ment ?gal $\pi_i$, l'?tape courante de l'algorithme de Newton-Raphson 
+peut s'?crire comme suit :
+
+\begin{equation}
+\boldsymbol{\beta}^{(s+1)} =  \boldsymbol{\beta}^{(s)} + \left(\mathbf{X}^t\mathbf{V}\mathbf{X}\right)^{-1}\mathbf{X}^t(\mathbf{y}- \boldsymbol{\pi})
+\end{equation}
+
+Le code ci-dessous impl?mente l'algorithme de Newton-Raphson pour la r?gression logistique
+
+
+```{r}
+my_lr = function(X, y, tolerance = 1e-6, max.iter=200){
+  X = cbind(1, X)
+  beta_s = rep(0, NCOL(X))
+  pi = runif(NROW(X), 0, 1)
+  V = diag(pi*(1-pi))
+  iter = 1
+  
+  made.changes = TRUE
+  
+  while (made.changes & (iter < max.iter))
+  {
+    iter = iter + 1
+    made.changes <- FALSE
+    beta_s_plus_1 = beta_s + solve(t(X)%*%V%*%X)%*%t(X)%*%(y-pi)
+    
+    pi = drop(1/(1+exp(-X%*%beta_s_plus_1)))
+    V = diag(pi*(1-pi)) 
+    
+    relative.change = drop(crossprod(beta_s_plus_1 - beta_s))/drop(crossprod(beta_s))
+    made.changes = (relative.change > tolerance)
+                
+    beta_s = beta_s_plus_1
+    
+    if (iter == 200) 
+      warning("The Newton-Raphson algorithm did not converge after 200 iterations.")
+  }  
+  
+  return(list(beta = beta_s , proba = pi))
+}
+
+```
+
+## Comparison between my_lr and glm 
+
+```{r}
+res.mylr = my_lr(X, y)
+res.mylr
+```
+
+La fonction \textbf{glm()} disponible dans le package \textbf{stats} impl?mente le mod?le lin?aire g?n?ralis?. La r?gression logistique binaire comme cas particulier du mod?le lin?aire g?n?ralis? est donc disponible via cette fonction. 
+
+```{r}
+res.glm = glm(y~X, family = binomial)
+summary(res.glm)
+```
+
+Reste alors ? comparer l'estimateur di maximum de vraisemblance 
+issu de notre impl?mentation ? celui estim? par la fonction \textbf{glm()}
+... verdict.... 
+
+## Visualisation de la fronti?re de d?cision
+
+La figure suivante repr?sente les entreprises dans le plan des variables $\mathbf{x}_1$ et $\mathbf{x}_2$ et s?parer les deux classes d'entreprise par la droite d'iso-probabilit? $0.5$ d'?quation :
+\[5.94 -6.556X_1 - 3.019X_3 = 0 \iff X_3 = -\frac{6.556}{3.019}X_1 + \frac{5.94}{3.019}\] 
+
+```{r}
+plot(X, 
+     bg = c("red", "green3")[as.factor(y)], 
+     pch = c(21, 25)[as.factor(y)], 
+     main = "Faillite d'une entreprise", 
+     xlab = "Flux de tr?sorerie/Dette totale (X1)", 
+     ylab = "Actif ? court terme/Dette ? court terme (X2)"
+)
+b = res.mylr$beta[1]
+a1 = res.mylr$beta[2]
+a2 = res.mylr$beta[3]
+abline(-b/a2, -a1/a2, col = "black")
+```
+
+
