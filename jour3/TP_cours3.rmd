@@ -1,88 +1,98 @@
 ---
 title: "Analyse statistique avec R"
-author: "Arthur Tenenhaus"
-date: "Monday, September 07, 2015"
+author: "Arthur Tenenhaus et Vincent Guillemot"
+date: "Thursday, September 10, 2015"
 output: pdf_document
 ---
 
-# La R?gression multiple
+# La Régression multiple
 
-La r?gression mutiple est une m?thode statistique adapt?e ? l'?tude de la liaison entre une variable quantitative $Y$ et un ensemble de $p$ variables explicatives $X_1, X_2, \ldots, X_p$ quantitatives ou qualitatives. L'exemple compagnon de cette s?ance, \textbf{pr?vision du prix d'une automobile}, servira ? illustrer cette m?thode.
+La régression mutiple est une méthode statistique adaptée à l'étude de la liaison entre une variable quantitative $Y$ et un ensemble de $p$ variables explicatives $X_1, X_2, \ldots, X_p$ quantitatives ou qualitatives. L'exemple compagnon de cette séance, \textbf{prévision du prix d'une automobile}, servira à illustrer cette méthode.
 
-Les commandes suivantes permettent de charger et mettre en forme le jeu de donn?es AUTO.
+Les commandes suivantes permettent de charger et mettre en forme le jeu de données AUTO.
 
 ```{r, warning=FALSE, message=FALSE}
 library(gdata)
 library(pheatmap)
-A = read.table("AUTO.csv", header=TRUE, sep="\t")
+A = read.xls("C:/Users/tenenhaus_art/Desktop/Home/Travail/COURS/Cours ICM/R/jour3/AUTO.xls")
 rownames(A) = A[, 1]
 A = A[, -1]
 head(A)
 ```
 
-On se propose de construire un mod?le de pr?diction du prix d'une automobile ? partir des `r NCOL(A)-1` variables caract?ristiques suivantes. 
+On se propose de construire un modèle de prédiction du prix d'une automobile à 
+partir des `r NCOL(A)-1` variables caractéristiques suivantes. 
 
 ```{r}
 colnames(A)[-7]
 ```
 
-Ces variables ont ?t? mesur?es sur `r NROW(A)` automobiles.
+Ces variables ont été mesurées sur `r NROW(A)` automobiles.
 
-##Analyse exploratoire des donn?es
-
-Toute bonne mod?lisation doit ?tre pr?c?d?e d'une ?tape d'analyse 
-exploratoire des donn?es. L'objectif de cette analyse exploratoire 
-est de mat?rialiser au travers de figures de m?rite et d'indicateurs 
-le contenu des donn?es. La figure suivante renvoie l'ensemble des graphes 
-bivari?s, la taille des points refl?tant la valeur de la variable ? expliquer.
-
-```{r, fig.align='center', fig.height=8, fig.width=8}
-pairs(A[, -7], cex = exp(A$PRIX/min(A$PRIX)-1), )
+```{r}
+NROW(A)
 ```
 
-La figure suivante permet de visualiser la structure de corr?lation 
-et les relations entre variables.
+
+##Analyse exploratoire des données
+
+Toute bonne modélisation doit être précédée d'une étape d'analyse 
+exploratoire des données. L'objectif de cette analyse exploratoire 
+est de matérialiser au travers de figures de mérite et d'indicateurs 
+le contenu des données. La figure suivante renvoie l'ensemble des graphes 
+bivariés, la taille des points reflétant la valeur de la variable à expliquer.
+
+```{r, fig.align='center', fig.height=8, fig.width=8}
+pairs(A, cex = A$PRIX/median(A$PRIX))
+```
+
+La figure suivante permet de visualiser la structure de corrélation entre variables.
 
 ```{r, fig.align='center', fig.height=8, fig.width=8}
 pheatmap(cor(A), display_numbers = TRUE)
 ```
 
-On constate que les variables CYL, PUI et VITESSE sont corr?l?es entre elles 
-tout comme LAR, LON et POIDS.
-
-Cette structure de corr?lation entre variables est ?galement exhib?? gr?ce ? l'analyse
-en composante principale (ACP). La commande suivante permet de r?aliser une ACP
+On constate de fortes multicolinéarités entre variables (CYL, PUI et VITESSE) 
+d'une part et (LAR, LON, POIDS) d'autre part.
+Cette structure de corrélation entre variables peut également être exhibée par l'analyse
+en composante principale (ACP). La commande suivante permet de réaliser une ACP
 
 ```{r}
 res.pca = princomp(A, cor = TRUE)
 summary(res.pca)
 ```
 
-La variance de la composante s'obtient ?galement par la commande suivante
+La variance de la composante s'obtient également par la commande suivante
 
 ```{r}
 apply(res.pca$scores, 2, function(x) sd(x)*sqrt((NROW(A)-1)/(NROW(A))))
 ```
 
-La variance cumul?e s'obtient comme suit:
+La variance cumulée s'obtient comme suit:
 
 ```{r}
 variance = apply(res.pca$scores, 2, function(x) var(x)*(NROW(A)-1)/(NROW(A)))
 cumsum(variance)/sum(variance)
 ```
 
-On constate que les deux premi?res composantes capturent pr?s de 85\% 
-de l'information pr?sente dans les donn?es. On en d?duit qu'une repr?sentation 
-des donn?es sur le premier plan principal fournit une bonne approximation des 
+On constate que les deux premières composantes capturent près de 85\% 
+de l'information présente dans les données. On en déduit qu'une représentation 
+des données sur le premier plan principal fournit une bonne approximation des 
 relations entre individus.  
 
-Le biplot associ? est repr?sent? ci-dessous
+Le biplot associé est représenté ci-dessous
 
 ```{r, fig.align='center', fig.height=8, fig.width=8}
 biplot(res.pca, cex = .6)
 ```
 
-# Calcul manuel des coefficients de r?gression et via la fonction lm()
+# Calcul manuel des coefficients de régression et via la fonction lm()
+
+On cherche maintenant à construire un modèle prédictif du prix d'une automobile 
+en fonction de ses grandeurs caractéristiques  "CYL", "PUI", "LON", "LAR", "POIDS", 
+"VITESSE". La régression multiple est la méthode de choix pour construire ce type 
+de modèle.
+
 ```{r}
 y = A$PRIX
 X = cbind(1, as.matrix(A[, -7]))
@@ -96,128 +106,164 @@ res.lm = lm(PRIX ~ ., data = A)
 summary(res.lm)
 ```
 
-On constate que les deux approches conduisent aux m?mes coefficients de r?gression. 
+On constate que les deux approches conduisent aux mêmes coefficients de régression. 
 
-\textbf{Il faut en permanence conserver un esprit critique sur les mod?les g?n?r?s} : 
-L'examen des coefficients de r?gression et leur niveau de significativit? nous conduit 
-? rejeter le mod?le. En effet, contrairement ? ce que nous laissait conclure l'analyse 
-exploratoire des donn?es, aucune des variables n'est significative. De plus, les signes des 
-coefficients de r?gression associ?s ? CYL, LON et VITESSE ne sont pas en coh?rence avec 
-l'intuition. D'o? peut provenir le probl?me ? 
+\textbf{Il faut en permanence conserver un esprit critique sur les modèles générés} : 
+L'examen des coefficients de régression et leur niveau de significativité nous conduit 
+à rejeter le modèle. En effet, contrairement à ce que nous laissait conclure l'analyse 
+exploratoire des données, aucune des variables n'est significative. De plus, les signes des 
+coefficients de régression associés à CYL, LON et VITESSE ne sont pas en cohérence avec 
+l'intuition. D'où peut provenir le problème ? 
 
-Comme discut? ci-dessous, la matrice de corr?lation montre une forte corr?lation 
-entre variables. Or, nous savons que $\widehat{\text{var}}(\hat{\boldsymbol{\beta}}) 
+Comme discuté ci-dessous, la matrice de corrélation montre une forte corrélation 
+entre variables. Or, nous savons que $\text{var}(\hat{\boldsymbol{\beta}}) 
 =\sigma^2 \left(\mathbf{X}^t \mathbf{X} \right)^{-1}$, et donc la variance de 
-l'estimateur des moindres carr?es peut exploser en pr?sence de fortes multicolin?arit?s 
-entre variables. Il faut donc, parmi les paquets de variables corr?l?es, s?lectionner un 
-repr?sentant de chaque. Pour ce faire, nous proposons l'utilisation d'une approche de type stepwise.
+l'estimateur des moindres carrées peut exploser en présence de fortes multicolinéarités 
+entre variables. Il faut sans doute, parmi les paquets de variables corrélées (CYL, PUI et VITESSE) 
+et (LAR, LON, POIDS), sélectionner un représentant de chaque. Pour ce faire, compte tenu du faible
+nombre de variables nous proposons d'utiliser une approche exhaustive. La fonction \texttt{regsubsets} du package \texttt{leaps} permet ce type d'analyse.
+ 
+ 
 
 ```{r}
-step(res.lm, direction = "backward")
+library(leaps)
+exh.search = regsubsets(PRIX ~ ., data = A, method = "exhaustive")
 ```
 
-Les variables PUI et POIDS sont conserv?es dans le mod?le final.
+Pour pouvoir utiliser les résultats de cette proocédure, le graphique est l'outil le plus approprié.
+La fonction \texttt{regsubsets} propose $4$ critères de choix : Le BIC, le Cp, le $R^2_{adj}$ et le $R^2$.
+La Figure ci-dessous reporte les résultats associés à ces $4$ critères.
+
+```{r, fig.align='center', fig.height= 10, fig.width=10}
+layout(matrix(1:4, 2, 2))
+plot(exh.search, scale = "bic")
+plot(exh.search, scale = "Cp")
+plot(exh.search, scale = "adjr2")
+plot(exh.search, scale = "r2")
+```
+
+Le modèle sélectionné dépend du critère considéré. Par exemple, si on considère un critère de type $R^2$-ajusté, les variables retenues sont PUI et POIDS. Le modèle final associé est reporté ci-dessous.
 
 ```{r}
 res.final = lm(PRIX~PUI+POIDS, data = A)
 summary(res.final)
 ```
 
+La figure ci-dessous présente le graphe bivarié de la puissance de la voiture en fonction du poids. La code couleur reflétant le prix de la voiture.
 
+```{r, fig.align='center', fig.height=9, fig.width=9}
+#Creation d'une fonction générant palette de couleur continue
+yrPal <- colorRampPalette(c('yellow','red'))
 
-```{r}
-plot(A$PUI, A$POIDS, col = "white", cex = A$PRIX, xlim = c(45, 135))
-text(A$PUI, A$POIDS, paste(rownames(A), "(", A$PRIX, ")", sep = ""), cex = .6)
+# Cette commande permet de créer un vecteur de couleur qui dépend des valeurs 
+# prise par PRIX.
+Col <- yrPal(10)[as.numeric(cut(A$PRIX,breaks = 10))]
+plot(A$PUI, A$POIDS , col = "white", xlim = c(45, 135), 
+     main  = "Prix des automobiles",
+     xlab = "Puissance", ylab = "Poids")
+text(A$PUI, A$POIDS, rownames(A), col = Col, cex = .8)
 ```
 
 
+# La régression logistique
 
-# La r?gression logistique
-
-La r?gression logistique est une m?thode statistique adapt?e ? l'?tude de la liaison entre une variable qualitative $Y$ et un ensemble de $p$ variables explicatives $X_1, X_2, \ldots, X_p$ quantitatives ou qualitatives. L'exemple compagnon de cette s?ance, \textbf{pr?vision de la faillite d'entreprises}, servira ? illustrer cette m?thode.
+La régression logistique est une méthode statistique adaptée à l'étude de la liaison entre une variable qualitative $Y$ et un ensemble de $p$ variables explicatives $X_1, X_2, \ldots, X_p$ quantitatives ou qualitatives. L'exemple compagnon de cette séance, \textbf{prévision de la faillite d'entreprises}, servira à illustrer cette méthode.
 
 
-## Pr?sentation des donn?es et notations 
+## Présentation des données et notations 
 
-On se propose de construire un mod?le de pr?vision de la faillite d'une entreprise ? partir de donn?es financi?re r?colt?es par R.A. Johnson et D.W. Wichern en 1982. Ces donn?es financi?res annuelles ont ?t? recueillies sur $21$ entreprises approximativement deux ans avant leur faillite, et, ? peu pr?s ? la m?me ?poque, sur 25 soci?t?s financi?rement solides. Les donn?es r?unissent, pour chaque entreprise, deux ratios financiers et leur situation deux ans plus tard : 
+On se propose de construire un modèle de prévision de la faillite d'une entreprise à partir de données financière récoltées par R.A. Johnson et D.W. Wichern en 1982. Ces données financières annuelles ont été recueillies sur $21$ entreprises approximativement deux ans avant leur faillite, et, à peu près à la même époque, sur 25 sociétés financièrement solides. Les données réunissent, pour chaque entreprise, deux ratios financiers et leur situation deux ans plus tard : 
 
 variable        | Signification
 -------------   | -------------
-$\mathbf{x}_1$  | Flux de tr?sorerie / Dette totale
-$\mathbf{x}_2$  | Actif ? court terme / Dette ? court terme
-$\mathbf{y}$    | Faillite (1), non faillite (0)
+$X_1$  | Flux de trésorerie / Dette totale
+$X_2$  | Actif à court terme / Dette à court terme
+$Y$    | Faillite (1), non faillite (0)
 
-## Chargement des donn?es
+## Chargement des données
 
 ```{r}
-A = read.table("faillite.txt", 
+A = read.table("C:/Users/tenenhaus_art/Desktop/Home/Travail/COURS/Cours ICM/R/jour3/faillite.txt", 
                header = TRUE)
-X = as.matrix(A[, c(2,4)])
-y = A[, 6]
+X = as.matrix(A[, 2:3])
+y = A[, 4]
 head(cbind(X, y))
 ```
 
-## Visualisation de donn?es
+## Visualisation de données
 
-Toute bonne mod?lisation doit ?tre pr?c?d?e d'une ?tape d'analyse exploratoire 
-des donn?es. L'objectif de cette analyse exploratoire est de mat?rialiser au 
-travers de figures de m?rite et d'indicateurs le contenu des donn?es. La figure 
-suivante renvoie le graphe bivari? ($\mathbf{x}_1$, $\mathbf{x}_2$), la couleur/forme 
-des points refl?tant la valeur de la variable ? expliquer.
+La figure suivante renvoie le graphe bivarié ($\mathbf{x}_1$, $\mathbf{x}_2$), la couleur/forme 
+des points reflétant la valeur de la variable à expliquer.
 
 ```{r}
 plot(X, 
      bg = c("red", "green3")[as.factor(y)], 
      pch = c(21, 25)[as.factor(y)], 
      main = "Faillite d'une entreprise", 
-     xlab = "Flux de tr?sorerie/Dette totale (x1)", 
-     ylab = "Actif ? court terme/Dette ? court terme (x2)"
+     xlab = "Flux de trésorerie/Dette totale (x1)", 
+     ylab = "Actif à court terme/Dette à court terme (x2)"
 )
 ```
 
 Il semble que ces deux variables soient porteuses d'information discriminante.
 
-on s'int?resse maintenant aux deux variables s?par?ment. Les bo?tes ? 
-moustaches des deux ratios financiers selon le crit?re de faillite sont 
-pr?sent?s sur la figure suivante. La bo?te ? moustache permet de visualiser 
-de mani?re tr?s compacte la dispersion des donn?es. La bo?te centrale est 
-construite ? partir du premier et du troisi?me quartile et est partag?e par 
-la m?diane. Les "moustaches" vont du premier quartile au minimum et du troisi?me 
-quartile au maximum. Par convention, les moustaches ne doivent pas d?passer 
-une fois et demi la distance interquartile. Si les points extr?mes sont trop 
-loin des quartiles, ils appara?tront comme isol?s (outliers) sur le graphique.
+On s'intéresse maintenant aux deux variables séparément. Les boîtes à 
+moustaches des deux ratios financiers selon le critère de faillite sont 
+présentés sur la figure suivante. La boîte à moustache permet de visualiser 
+de manière très compacte la dispersion des données. La boîte centrale est 
+construite à partir du premier et du troisième quartile et est partagée par 
+la médiane. Les "moustaches" vont du premier quartile au minimum et du troisième 
+quartile au maximum. Par convention, les moustaches ne doivent pas dépasser 
+une fois et demi la distance interquartile. Si les points extrêmes sont trop 
+loin des quartiles, ils apparaîtront comme isolés (outliers) sur le graphique.
 
 
 ```{r, fig.height = 8, fig.width=8 }
 layout(matrix(t(1:2), 1, 2))
 boxplot(X[, 1]~factor(y, 
                       labels = c("non faillite", "faillite")), 
-                      ylab = "Flux de tr?sorerie/Dette totale")
+                      ylab = "Flux de trésorerie/Dette totale")
 boxplot(X[, 2]~factor(y, 
                       labels = c("non faillite", "faillite")), 
-                      ylab = "Actif ? court terme/Dette ? court terme")
+                      ylab = "Actif à court terme/Dette à court terme")
 ```
 
+## Test de Student
 
-## L'algorithme de Newton-Raphson pour la r?gression logistique
+Pour chaque variable prise séparément, il est tout à fait possible de réaliser un test d'égalité des moyennes calculées sur chaque classe d'entreprises. La commande suivante permet de réaliser ces test
 
-Les param?tres du mod?le sont estim?s par maximum de vraisemblance. 
-L'algorithme utilis? pour trouver l'estimateur du maximum de vraisemblance 
-est l'algorithme de Newton-Raphson. 
+```{r}
+ttest_x1 = t.test(X[, 1]~y)
+ttest_x1
+ttest_x2 = t.test(X[, 2]~y)
+ttest_x2
+```
 
-Posons $\pi_i = P(Y=1|X= \boldsymbol{x}_i)$, $\mathbf{X}$ la matrice form?e 
-d'une premi?re colonne de coordonn?es constantes ?gales ? 1 et des $2$ colonnes 
-correspondant aux variables $\mathbf{x}_1$, $\mathbf{x}_2$ observ?es sur les $n$ 
-individus et $\mathbf{V}$ la matrice diagonale form?e des $\pi_i(1-\pi_i)$. 
-Enfin, notons $\boldsymbol{\pi}$ le vecteur de probabilit?s tel que le i?me 
-?l?ment ?gal $\pi_i$, l'?tape courante de l'algorithme de Newton-Raphson 
-peut s'?crire comme suit :
+Comme on pouvait s'y attendre, les deux tests de Student conduisent à rejeter 
+l'hypothèse d'égalité des moyennes (p.value associée aux deux tests < .05). 
+Ceci nous permet de conclure que ces deux ratios financiers se comportent 
+différemment dans des situations de faillite ou de non-faillite.
+
+## L'algorithme de Newton-Raphson pour la régression logistique
+
+On cherche maintenant à construire un modèle prédicition de la variable qualitative 
+faillite/non-faillite à partir de ces deux ratios financiers. Pour ce faire, nous 
+nous proposons d'utiliser la régression logistique. Les paramètres du modèle logistique 
+sont estimés par maximum de vraisemblance. L'algorithme utilisé pour trouver l'estimateur 
+du maximum de vraisemblance est l'algorithme de Newton-Raphson. 
+
+Posons $\pi_i = P(Y=1|X= \boldsymbol{x}_i)$ et $\boldsymbol{\pi}$ le vecteur de probabilités tel que le ième 
+élément égal $\pi_i$. Notons $\mathbf{X}$ la matrice formée 
+d'une première colonne de coordonnées constantes égales à 1 et des $2$ colonnes 
+correspondant aux variables $\mathbf{x}_1$, $\mathbf{x}_2$ observées sur les $n$ 
+individus. Notons enfin $\mathbf{V}$ la matrice diagonale formée des $\pi_i(1-\pi_i)$. 
+l'étape courante de l'algorithme de Newton-Raphson peut s'écrire comme suit :
 
 \begin{equation}
 \boldsymbol{\beta}^{(s+1)} =  \boldsymbol{\beta}^{(s)} + \left(\mathbf{X}^t\mathbf{V}\mathbf{X}\right)^{-1}\mathbf{X}^t(\mathbf{y}- \boldsymbol{\pi})
 \end{equation}
 
-Le code ci-dessous impl?mente l'algorithme de Newton-Raphson pour la r?gression logistique
+Le code ci-dessous implémente l'algorithme de Newton-Raphson pour la régression logistique
 
 
 ```{r}
@@ -246,7 +292,10 @@ my_lr = function(X, y, tolerance = 1e-6, max.iter=200){
     
     if (iter == 200) 
       warning("The Newton-Raphson algorithm did not converge after 200 iterations.")
-  }  
+     
+  } 
+  if (iter< 200) 
+    print(paste("The Newton-Raphson algorithm converges after",  iter, "iterations"))
   
   return(list(beta = beta_s , proba = pi))
 }
@@ -260,29 +309,29 @@ res.mylr = my_lr(X, y)
 res.mylr
 ```
 
-La fonction \textbf{glm()} disponible dans le package \textbf{stats} impl?mente le mod?le lin?aire g?n?ralis?. La r?gression logistique binaire comme cas particulier du mod?le lin?aire g?n?ralis? est donc disponible via cette fonction. 
+La fonction \textbf{glm()} disponible dans le package \textbf{stats} implémente le modèle linéaire généralisé. La régression logistique binaire comme cas particulier du modèle linéaire généralisé est donc disponible via cette fonction. 
 
 ```{r}
 res.glm = glm(y~X, family = binomial)
 summary(res.glm)
 ```
 
-Reste alors ? comparer l'estimateur di maximum de vraisemblance 
-issu de notre impl?mentation ? celui estim? par la fonction \textbf{glm()}
+Reste alors à comparer l'estimateur du maximum de vraisemblance 
+issu de notre implémentation à celui estimé par la fonction \textbf{glm()}
 ... verdict.... 
 
-## Visualisation de la fronti?re de d?cision
+## Visualisation de la frontière de décision
 
-La figure suivante repr?sente les entreprises dans le plan des variables $\mathbf{x}_1$ et $\mathbf{x}_2$ et s?parer les deux classes d'entreprise par la droite d'iso-probabilit? $0.5$ d'?quation :
-\[5.94 -6.556X_1 - 3.019X_3 = 0 \iff X_3 = -\frac{6.556}{3.019}X_1 + \frac{5.94}{3.019}\] 
+La figure suivante représente les entreprises dans le plan des variables $\mathbf{x}_1$ et $\mathbf{x}_2$ et séparer les deux classes d'entreprise par la droite d'iso-probabilité $0.5$ d'équation :
+\[5.94 -6.556X_1 - 3.019X_2 = 0 \iff X_2 = -\frac{6.556}{3.019}X_1 + \frac{5.94}{3.019}\] 
 
-```{r}
+```{r,fig.align='center', fig.height=9, fig.width=9}
 plot(X, 
      bg = c("red", "green3")[as.factor(y)], 
      pch = c(21, 25)[as.factor(y)], 
      main = "Faillite d'une entreprise", 
-     xlab = "Flux de tr?sorerie/Dette totale (X1)", 
-     ylab = "Actif ? court terme/Dette ? court terme (X2)"
+     xlab = "Flux de trésorerie/Dette totale (X1)", 
+     ylab = "Actif à court terme/Dette à court terme (X2)"
 )
 b = res.mylr$beta[1]
 a1 = res.mylr$beta[2]
